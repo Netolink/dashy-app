@@ -15,18 +15,6 @@
 </head>
 <body>
 
-    <div id="emojiPickerPopover" class="emoji-popover">
-        <div class="emoji-popover-title">בחירה מהירה:</div>
-        <div class="emoji-presets-grid" id="emojiPresetsGrid"></div>
-        <div class="emoji-custom-section">
-            <div class="emoji-popover-title">הדבקת אימוג'י מותאם אישית:</div>
-            <div class="emoji-custom-row">
-                <input type="text" id="emojiCustomInput" class="emoji-custom-input" placeholder="הדבק" maxlength="4">
-                <button id="emojiCustomSaveBtn" class="emoji-custom-save-btn" disabled>אישור</button>
-            </div>
-        </div>
-    </div>
-
     <div class="container">
         <div class="auth-bar glass-panel">
             <div id="authStatusLeft">
@@ -312,6 +300,18 @@
             <div class="modal-buttons">
                 <button class="btn" id="confirmCancelBtn" onclick="closeModal('confirmModal')">ביטול</button>
                 <button class="btn btn-danger" id="confirmExecuteBtn">אישור</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="emojiPickerPopover" class="emoji-popover">
+        <div class="emoji-popover-title">בחירה מהירה:</div>
+        <div class="emoji-presets-grid" id="emojiPresetsGrid"></div>
+        <div class="emoji-custom-section">
+            <div class="emoji-popover-title">הדבקת אימוג'י מותאם אישית:</div>
+            <div class="emoji-custom-row">
+                <input type="text" id="emojiCustomInput" class="emoji-custom-input" placeholder="הדבק" maxlength="4">
+                <button id="emojiCustomSaveBtn" class="emoji-custom-save-btn" disabled>אישור</button>
             </div>
         </div>
     </div>
