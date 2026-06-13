@@ -665,15 +665,19 @@ header h1 {
 .emoji-popover { 
     display: none; 
     position: absolute; 
-    top: 58px;
-    right: 0;
+    bottom: calc(100% + 8px);
+    left: 0;
+    right: auto;
+    
     background: #151d30; 
     border: 1px solid rgba(255, 255, 255, 0.15); 
     border-radius: 12px; 
     padding: 1rem; 
     width: 260px; 
     box-shadow: 0 10px 30px rgba(0,0,0,0.6); 
-    z-index: 2000; 
+    
+    /* ציפה מוחלטת מעל כל חלון מודאל קיים */
+    z-index: 9999 !important; 
 }
 
 .emoji-popover-title { 
