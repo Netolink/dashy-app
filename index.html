@@ -3,323 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>כלים דיגיטליים באתר - Dashy Professional</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
+    <title>דשבורד כלים דיגיטליים</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0f172a',
+                        cardBg: '#1e293b',
+                        accentBlue: '#0ea5e9',
+                        accentPurple: '#a855f7'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
-<body>
+<body class="bg-darkBg text-slate-100 min-h-screen font-sans antialiased overflow-x-hidden">
 
-    <div id="emojiPickerPopover" class="emoji-popover">
-        <div class="emoji-popover-title">בחירה מהירה:</div>
-        <div class="emoji-presets-grid" id="emojiPresetsGrid"></div>
-        <div class="emoji-custom-section">
-            <div class="emoji-popover-title">הדבקת אימוג'י מותאם אישית:</div>
-            <div class="emoji-custom-row">
-                <input type="text" id="emojiCustomInput" class="emoji-custom-input" placeholder="הדבק" maxlength="4">
-                <button id="emojiCustomSaveBtn" class="emoji-custom-save-btn" disabled>אישור</button>
+    <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <h1 class="text-2xl font-bold bg-gradient-to-r from-accentBlue to-accentPurple bg-clip-text text-transparent">
+                כלים דיגיטליים באתר
+            </h1>
+            <div id="dashboards-tabs-container" class="flex items-center gap-2 overflow-x-auto max-w-full py-1">
+                </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        
+        <div class="flex flex-col items-center mb-8 text-center">
+            <div class="flex items-center gap-3 bg-slate-900/60 px-6 py-3 rounded-full border border-slate-800 shadow-xl">
+                <span id="active-dash-icon" class="text-xl">🚀</span>
+                <h2 id="active-dash-title" class="text-xl font-semibold text-white">דשבורד ראשי</h2>
+                <button id="btn-edit-dash" class="text-slate-400 hover:text-accentBlue transition-colors text-sm" title="ערוך שם ואימוג'י לדשבורד">
+                    <i class="fas fa-pencil-alt"></i>
+                </button>
             </div>
         </div>
-    </div>
 
-    <div class="container">
-        <div class="auth-bar glass-panel">
-            <div id="authStatusLeft">
-                <span style="color: var(--text-muted); font-size: 0.9rem;">מצב: עבודה מקומית (אורח)</span>
-            </div>
-            <div id="authStatusRight">
-                <button class="btn" onclick="loginWithGoogle()" style="color: var(--accent);">🌐 התחברות מהירה עם גוגל</button>
-            </div>
-        </div>
-
-        <div id="popularSection" class="popular-section glass-panel">
-            <div class="popular-title">🔥 כלים נפוצים ביותר:</div>
-            <div class="popular-grid" id="popularGrid"></div>
-        </div>
-
-        <header>
-            <h1>כלים דיגיטליים באתר</h1>
-            
-            <div class="dashboard-tabs" id="dashboardTabsArea"></div>
-            
-            <div class="active-dash-manage glass-panel" id="activeDashManageRow">
-                <span class="dash-manage-title" id="activeDashTitleDisplay">🚀 דשבורד ראשי</span>
-                <button class="edit-icon-btn" onclick="openEditDashModal()" title="עריכת דשבורד">✏️</button>
+        <div class="max-w-xl mx-auto mb-10 flex flex-col gap-4">
+            <div class="relative">
+                <i class="fas fa-search absolute right-4 top-3.5 text-slate-400"></i>
+                <input type="text" id="search-input" placeholder="חיפוש מהיר בדשבורד הנוכחי..." 
+                       class="w-full bg-slate-900/80 border border-slate-700 rounded-xl py-3 pr-12 pl-4 text-white placeholder-slate-500 focus:outline-none focus:border-accentBlue transition-colors shadow-inner">
             </div>
             
-            <div class="search-bar-container">
-                <input type="text" id="searchBar" class="search-bar" placeholder="חיפוש מהיר בדשבורד הנוכחי...">
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <button id="btn-add-tool" class="bg-accentBlue hover:bg-sky-600 text-white font-medium py-2.5 px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-sm sm:text-base">
+                    <i class="fas fa-plus"></i> הוספת כלי חדש
+                </button>
+                <button id="btn-add-category" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium py-2.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm sm:text-base">
+                    <i class="fas fa-folder-plus text-amber-500"></i> קטגוריה חדשה
+                </button>
+                <button id="btn-import-bookmarks" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium py-2.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2 col-span-2 sm:col-span-1 text-sm sm:text-base">
+                    <i class="fas fa-cog text-indigo-400"></i> גיבוי וייבוא סימניות
+                </button>
             </div>
+        </div>
 
-            <div class="actions-row">
-                <button class="btn btn-primary" onclick="openModal('itemModal')">➕ הוספת כלי חדש</button>
-                <button class="btn" onclick="openModal('catModal')">📁 קטגוריה חדשה</button>
-                <button class="btn" onclick="toggleSettings()">⚙️ גיבוי וייבוא סימניות</button>
-                <button class="btn btn-danger" id="deleteDashBtn" onclick="deleteCurrentDashboard()" style="display:none;">🗑️ מחיקת דשבורד נוכחי</button>
+        <div id="most-used-section" class="mb-10 hidden">
+            <h3 class="text-lg font-medium text-slate-300 mb-4 flex items-center gap-2">
+                <i class="fas fa-fire text-orange-500"></i> הכלים הנפוצים ביותר
+            </h3>
+            <div id="most-used-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                </div>
+        </div>
+
+        <div id="categories-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[200px]">
             </div>
+    </main>
 
-            <div id="settingsPanel" class="settings-panel glass-panel">
-                <div class="settings-grid">
-                    <div class="settings-group">
-                        <div class="settings-info">
-                            <h4>גיבוי הדשבורד (JSON)</h4>
-                            <p>הורדת קובץ עם כל המידע הנוכחי למחשב.</p>
+    <div id="modal-overlay" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
+        
+        <div id="modal-category" class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl hidden transform scale-95 transition-transform duration-300">
+            <h3 id="modal-category-title" class="text-xl font-bold text-accentBlue mb-6">יצירת קטגוריה חדשה</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">בחירת אייקון</label>
+                    <div class="relative inline-block">
+                        <button id="category-emoji-trigger" class="text-3xl bg-slate-800 border border-slate-700 p-3 rounded-xl hover:bg-slate-700 transition-colors">📁</button>
+                        <div id="emoji-popover" class="absolute top-14 right-0 bg-slate-800 border border-slate-700 rounded-xl p-3 shadow-xl hidden grid grid-cols-6 gap-2 w-56 z-50 max-h-48 overflow-y-auto">
+                            <span class="emoji-option cursor-pointer text-xl text-center p-1 hover:bg-slate-700 rounded">📁</span>
+                            <span class="emoji-option cursor-pointer text-xl text-center p-1 hover:bg-slate-700 rounded">🛠️</span>
+                            <span class="emoji-option cursor-pointer text-xl text-center p-1 hover:bg-slate-700 rounded">🚀</span>
+                            <span class="emoji-option cursor-pointer text-xl text-center p-1 hover:bg-slate-700 rounded">📊</span>
+                            <span class="emoji-option cursor-pointer text-xl text-center p-1 hover:bg-slate-700 rounded">🌐</span>
+                            <span class="emoji-option cursor-pointer text-xl text-center p-1 hover:bg-slate-700 rounded">🔒</span>
+                            <span class="emoji-option cursor-pointer text-xl text-center p-1 hover:bg-slate-700 rounded">🎨</span>
+                            <span class="emoji-option cursor-pointer text-xl text-center p-1 hover:bg-slate-700 rounded">📝</span>
+                            <span class="emoji-option cursor-pointer text-xl text-center p-1 hover:bg-slate-700 rounded">💻</span>
+                            <span class="emoji-option cursor-pointer text-xl text-center p-1 hover:bg-slate-700 rounded">🤖</span>
+                            <span class="emoji-option cursor-pointer text-xl text-center p-1 hover:bg-slate-700 rounded">📢</span>
+                            <span class="emoji-option cursor-pointer text-xl text-center p-1 hover:bg-slate-700 rounded">🔗</span>
                         </div>
-                        <button class="btn" onclick="exportDataJSON()" style="color: var(--accent);">📥 ייצוא קובץ גיבוי</button>
                     </div>
-                    <div class="settings-group">
-                        <div class="settings-info">
-                            <h4>שחזור דשבורד מגיבוי</h4>
-                            <p>העלאת קובץ גיבוי JSON שנשמר בעבר.</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-1">שם הקטגוריה</label>
+                    <input type="text" id="category-name" placeholder="למשל: כללי, פיתוח" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-accentBlue">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">צבע קטגוריה</label>
+                    <div id="color-palette" class="grid grid-cols-6 gap-2">
                         </div>
-                        <label class="file-input-label">
-                            📤 בחירת קובץ גיבוי
-                            <input type="file" id="importJsonInput" class="hidden-file-input" accept=".json" onchange="importDataJSON(event)">
-                        </label>
+                </div>
+                <div class="flex justify-end gap-3 pt-4">
+                    <button id="btn-cancel-category" class="px-5 py-2 rounded-xl text-slate-400 hover:bg-slate-800 transition-colors">ביטול</button>
+                    <button id="btn-save-category" class="bg-accentBlue hover:bg-sky-600 text-white font-medium px-5 py-2 rounded-xl transition-colors">צור קטגוריה</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-tool" class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl hidden transform scale-95 transition-transform duration-300">
+            <h3 id="modal-tool-title" class="text-xl font-bold text-accentBlue mb-6">הוספת כלי חדש</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-1">שם הכלי</label>
+                    <input type="text" id="tool-name" placeholder="למשל: גוגל אנליטיקס" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-accentBlue">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-1">כתובת הקישור (URL)</label>
+                    <input type="url" id="tool-url" placeholder="https://example.com" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-accentBlue left-to-right text-left">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-1">קטגוריית יעד</label>
+                    <select id="tool-category-select" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-accentBlue">
+                        </select>
+                </div>
+                <div class="flex justify-end gap-3 pt-4">
+                    <button id="btn-cancel-tool" class="px-5 py-2 rounded-xl text-slate-400 hover:bg-slate-800 transition-colors">ביטול</button>
+                    <button id="btn-save-tool" class="bg-accentBlue hover:bg-sky-600 text-white font-medium px-5 py-2 rounded-xl transition-colors">שמור כלי</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-import" class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl hidden transform scale-95 transition-transform duration-300">
+            <h3 class="text-xl font-bold text-slate-100 mb-4 flex items-center gap-2">
+                <i class="fas fa-file-import text-indigo-400"></i> ניהול נתונים וסימניות דפדפן
+            </h3>
+            <p class="text-sm text-slate-400 mb-6">באפשרותך לייבא קובץ סימניות שהופק מהדפדפן (HTML). המערכת תזהה את התיקיות הראשיות ותהפוך אותן אוטומטית לקטגוריות בדשבורד הנוכחי.</p>
+            
+            <div class="space-y-6">
+                <div class="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                    <label class="block text-sm font-medium text-slate-300 mb-2">ייבוא מקובץ HTML של הדפדפן</label>
+                    <input type="file" id="bookmarks-file-input" accept=".html" class="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 file:cursor-pointer">
+                    <div id="import-folder-selector-container" class="mt-4 hidden">
+                        <label class="block text-xs font-medium text-slate-400 mb-2">בחר אילו תיקיות ראשיות לייבא כאינטגרציה מלאה:</label>
+                        <div id="import-folders-list" class="space-y-1.5 max-h-36 overflow-y-auto bg-slate-900 p-2.5 rounded-lg border border-slate-750">
+                            </div>
+                        <button id="btn-confirm-import-folders" class="mt-3 w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium py-2 rounded-lg transition-colors">בצע ייבוא עבור התיקיות שנבחרו</button>
                     </div>
-                    <div class="settings-group">
-                        <div class="settings-info">
-                            <h4>ייבוא סימניות מהדפדפן</h4>
-                            <p>העלאת קובץ HTML של Bookmarks שיש בדפדפן.</p>
-                        </div>
-                        <label class="file-input-label" style="border-color: var(--success); color: var(--success);">
-                            🌐 ייבוא קובץ Bookmarks
-                            <input type="file" id="importBookmarksInput" class="hidden-file-input" accept=".html" onchange="importBookmarksHTML(event)">
-                        </label>
-                    </div>
                 </div>
-            </div>
-        </header>
 
-        <main class="categories-grid" id="categoriesGrid"></main>
-    </div>
-
-    <div id="itemModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">הוספת כלי חדש לדשבורד</div>
-            <div class="form-group"><label>שם הכלי</label><input type="text" id="itemName" class="form-control" placeholder="למשל: Speed Insights"></div>
-            <div class="form-group"><label>כתובת URL (לינק)</label><input type="url" id="itemUrl" class="form-control" placeholder="https://example.com" dir="ltr"></div>
-            <div class="form-group">
-                <label>בחירת קטגוריה</label>
-                <div class="category-select-row">
-                    <select id="itemCategorySelect" class="form-control"></select>
-                    <button class="btn-inline-add" title="יצירת קטגוריה חדשה מיד" onclick="openInlineCategoryCreate()">➕</button>
+                <div class="grid grid-cols-2 gap-4">
+                    <button id="btn-export-json" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 py-3 px-4 rounded-xl text-sm transition-colors flex items-center justify-center gap-2">
+                        <i class="fas fa-download"></i> גיבוי נתונים (JSON)
+                    </button>
+                    <button id="btn-import-json-trigger" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 py-3 px-4 rounded-xl text-sm transition-colors flex items-center justify-center gap-2">
+                        <i class="fas fa-upload"></i> שחזור מגיבוי (JSON)
+                    </button>
                 </div>
+                <input type="file" id="json-file-input" accept=".json" class="hidden">
             </div>
-            <div class="modal-buttons">
-                <button class="btn" onclick="closeModal('itemModal')">ביטול</button>
-                <button class="btn btn-primary" onclick="saveTool()">שמירת כלי</button>
+
+            <div class="flex justify-end gap-3 pt-6 border-t border-slate-800 mt-6">
+                <button id="btn-close-import" class="px-5 py-2 bg-slate-800 text-slate-300 rounded-xl hover:bg-slate-700 transition-colors w-full sm:w-auto">סגור</button>
             </div>
         </div>
-    </div>
 
-    <div id="editItemModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">עריכת כלי</div>
-            <input type="hidden" id="editItemTargetCatId">
-            <input type="hidden" id="editItemTargetId">
-            <div class="form-group"><label>שם הכלי</label><input type="text" id="editItemName" class="form-control"></div>
-            <div class="form-group"><label>כתובת URL (לינק)</label><input type="url" id="editItemUrl" class="form-control" dir="ltr"></div>
-            <div class="form-group">
-                <label>העברה לקטגוריה</label>
-                <select id="editItemCategorySelect" class="form-control"></select>
-            </div>
-            <div class="modal-buttons">
-                <button class="btn" onclick="closeModal('editItemModal')">ביטול</button>
-                <button class="btn btn-primary" onclick="saveEditTool()">עדכון כלי</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="subLinkModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">🔗 הוספת קיצור דרך פנימי לכלי</div>
-            <input type="hidden" id="subLinkCatId">
-            <input type="hidden" id="subLinkId">
-            <div class="form-group"><label>כותרת קצרה (למשל: הגדרות, ניהול)</label><input type="text" id="subLinkTitle" class="form-control" placeholder="כותרת"></div>
-            <div class="form-group"><label>כתובת URL פנימית</label><input type="url" id="subLinkUrl" class="form-control" placeholder="https://example.com/subpage" dir="ltr"></div>
-            <div class="modal-buttons">
-                <button class="btn" onclick="closeModal('subLinkModal')">ביטול</button>
-                <button class="btn btn-primary" onclick="saveSubLink()">הוספת קיצור דרך</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="catModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">יצירת קטגוריה חדשה</div>
-            <div class="form-group" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+        <div id="modal-dashboard" class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl hidden transform scale-95 transition-transform duration-300">
+            <h3 id="modal-dashboard-title" class="text-xl font-bold text-accentPurple mb-6">עריכת הגדרות דשבורד</h3>
+            <div class="space-y-4">
                 <div>
-                    <label>אייקון קטגוריה</label>
-                    <button type="button" id="catEmojiTriggerBtn" class="emoji-selector-trigger-btn" onclick="toggleEmojiPicker(this, 'catHiddenEmojiInput')">📁</button>
-                    <input type="hidden" id="catHiddenEmojiInput" value="📁">
+                    <label class="block text-sm font-medium text-slate-400 mb-1">אימוג'י מייצג</label>
+                    <input type="text" id="dashboard-icon-input" placeholder="🚀" class="w-12 text-center bg-slate-800 border border-slate-700 rounded-xl p-3 text-xl text-white focus:outline-none focus:border-accentPurple">
                 </div>
-                <div style="flex-grow: 1;">
-                    <label>שם הקטגוריה</label>
-                    <input type="text" id="catName" class="form-control" placeholder="למשל: כללי, פיתוח">
-                </div>
-            </div>
-            <div class="form-group">
-                <label>צבע קטגוריה</label>
-                <div class="color-picker-grid" id="catColorPicker"></div>
-            </div>
-            <div class="modal-buttons">
-                <button class="btn" onclick="closeModal('catModal')">ביטול</button>
-                <button class="btn btn-primary" onclick="saveCategory()">יצירת קטגוריה</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="inlineCatModal" class="modal" style="z-index: 1100;">
-        <div class="modal-content">
-            <div class="modal-header">יצירת קטגוריה מהירה</div>
-            <div class="form-group" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
                 <div>
-                    <label>אייקון</label>
-                    <button type="button" id="inlineCatEmojiTriggerBtn" class="emoji-selector-trigger-btn" onclick="toggleEmojiPicker(this, 'inlineCatHiddenEmojiInput')">📁</button>
-                    <input type="hidden" id="inlineCatHiddenEmojiInput" value="📁">
+                    <label class="block text-sm font-medium text-slate-400 mb-1">שם הדשבורד</label>
+                    <input type="text" id="dashboard-name-input" placeholder="שם הדשבורד" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-accentPurple">
                 </div>
-                <div style="flex-grow: 1;">
-                    <label>שם הקטגוריה</label>
-                    <input type="text" id="inlineCatName" class="form-control" placeholder="שם הקטגוריה">
+                <div class="flex justify-end gap-3 pt-4">
+                    <button id="btn-cancel-dashboard" class="px-5 py-2 rounded-xl text-slate-400 hover:bg-slate-800 transition-colors">ביטול</button>
+                    <button id="btn-save-dashboard" class="bg-accentPurple hover:bg-purple-600 text-white font-medium px-5 py-2 rounded-xl transition-colors">שמור שינויים</button>
                 </div>
-            </div>
-            <div class="form-group">
-                <label>צבע קטגוריה</label>
-                <div class="color-picker-grid" id="inlineCatColorPicker"></div>
-            </div>
-            <div class="modal-buttons">
-                <button class="btn" onclick="closeModal('inlineCatModal')">ביטול</button>
-                <button class="btn btn-primary" onclick="saveInlineCategory()">הוספה ובחירה</button>
             </div>
         </div>
+
     </div>
 
-    <div id="dashModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">יצירת דשבורד חדש</div>
-            <div class="form-group" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
-                <div>
-                    <label>אייקון</label>
-                    <button type="button" id="newDashEmojiTriggerBtn" class="emoji-selector-trigger-btn" onclick="toggleEmojiPicker(this, 'newDashHiddenEmojiInput')">🚀</button>
-                    <input type="hidden" id="newDashHiddenEmojiInput" value="🚀">
-                </div>
-                <div style="flex-grow: 1;">
-                    <label>שם הדשבורד</label>
-                    <input type="text" id="newDashName" class="form-control" placeholder="שם הדשבורד">
-                </div>
-            </div>
-            <div class="modal-buttons">
-                <button class="btn" onclick="closeModal('dashModal')">ביטול</button>
-                <button class="btn btn-primary" onclick="createNewDashboard()">יצירת דשבורד</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="editDashModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">עריכת דשבורד</div>
-            <div class="form-group" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
-                <div>
-                    <label>אייקון</label>
-                    <button type="button" id="editDashEmojiTriggerBtn" class="emoji-selector-trigger-btn" onclick="toggleEmojiPicker(this, 'editDashHiddenEmojiInput')">🚀</button>
-                    <input type="hidden" id="editDashHiddenEmojiInput" value="🚀">
-                </div>
-                <div style="flex-grow: 1;">
-                    <label>שם הדשבורד</label>
-                    <input type="text" id="editDashName" class="form-control">
-                </div>
-            </div>
-            <div class="modal-buttons">
-                <button class="btn" onclick="closeModal('editDashModal')">ביטול</button>
-                <button class="btn btn-primary" onclick="saveEditDashboard()">עדכון דשבורד</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="editCatModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">עריכת קטגוריה</div>
-            <input type="hidden" id="editCatId">
-            <div class="form-group" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
-                <div>
-                    <label>אייקון</label>
-                    <button type="button" id="editCatEmojiTriggerBtn" class="emoji-selector-trigger-btn" onclick="toggleEmojiPicker(this, 'editCatHiddenEmojiInput')">📁</button>
-                    <input type="hidden" id="editCatHiddenEmojiInput" value="📁">
-                </div>
-                <div style="flex-grow: 1;">
-                    <label>שם הקטגוריה</label>
-                    <input type="text" id="editCatName" class="form-control">
-                </div>
-            </div>
-            <div class="form-group">
-                <label>צבע קטגוריה</label>
-                <div class="color-picker-grid" id="editCatColorPicker"></div>
-            </div>
-            <div class="modal-buttons">
-                <button class="btn" onclick="closeModal('editCatModal')">ביטול</button>
-                <button class="btn btn-primary" onclick="saveEditCategory()">עדכון קטגוריה</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="bookmarksImportModal" class="modal" style="z-index: 1300;">
-        <div class="modal-content" style="max-width: 500px;">
-            <div class="modal-header">🌐 הגדרות ייבוא סימניות</div>
-            <div class="form-group">
-                <label style="font-weight: 600; color: var(--accent);">1. כיצד תרצה לסדר את הסימניות?</label>
-                <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
-                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                        <input type="radio" name="bookmarkStructure" value="split" checked style="accent-color: var(--accent);">
-                        <span>פיצול אוטומטי לקטגוריות לפי תיקיות המקור</span>
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                        <input type="radio" name="bookmarkStructure" value="flat" style="accent-color: var(--accent);">
-                        <span>ריכוז כל הקישורים תחת קטגוריה אחת ("סימניות מיובאות")</span>
-                    </label>
-                </div>
-            </div>
-            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.08); margin: 1.5rem 0;">
-            <div class="form-group">
-                <label style="font-weight: 600; color: var(--accent);">2. אילו תיקיות תרצה לייבא?</label>
-                <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
-                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                        <input type="radio" name="bookmarkScope" value="all" checked onchange="toggleBookmarksFolderSelector(false)" style="accent-color: var(--accent);">
-                        <span>ברירת מחדל - ייבוא של הכל</span>
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                        <input type="radio" name="bookmarkScope" value="custom" onchange="toggleBookmarksFolderSelector(true)" style="accent-color: var(--accent);">
-                        <span>התאמה אישית (בחירת תיקיות ספציפיות)</span>
-                    </label>
-                </div>
-            </div>
-            <div id="bookmarksFolderSelectorArea" style="display: none; max-height: 200px; overflow-y: auto; background: #0b0f19; padding: 1rem; border-radius: 8px; border: 1px solid var(--panel-border); margin-top: 1rem;">
-                <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: bold;">בחר את התיקיות לייבוא:</div>
-                <div id="bookmarksFoldersCheckboxesGrid" style="display: flex; flex-direction: column; gap: 0.4rem;"></div>
-            </div>
-            <div class="modal-buttons" style="margin-top: 2rem;">
-                <button class="btn" onclick="closeModal('bookmarksImportModal')">ביטול</button>
-                <button class="btn btn-primary" id="executeBookmarksImportBtn">הפעל ייבוא</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="confirmModal" class="modal" style="z-index: 1400;">
-        <div class="modal-content">
-            <div class="modal-header" style="color:var(--danger);" id="confirmHeader">אישור מחיקה</div>
-            <p id="confirmMessage" style="margin-bottom: 1.5rem; color: var(--text-main); font-size:1rem;"></p>
-            <div class="modal-buttons">
-                <button class="btn" id="confirmCancelBtn" onclick="closeModal('confirmModal')">ביטול</button>
-                <button class="btn btn-danger" id="confirmExecuteBtn">אישור</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="script.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
