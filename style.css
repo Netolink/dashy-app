@@ -657,11 +657,16 @@ header h1 {
     background: rgba(56, 189, 248, 0.05); 
 }
 
+.emoji-picker-wrapper {
+    position: relative;
+    display: inline-block; /* או flex, תלוי במבנה השורה שלך */
+}
+
 .emoji-popover { 
     display: none; 
     position: absolute; 
-    top: 60px; 
-    right: 0; 
+    top: 58px;
+    right: 0;
     background: #151d30; 
     border: 1px solid rgba(255, 255, 255, 0.15); 
     border-radius: 12px; 
