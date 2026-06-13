@@ -19,12 +19,12 @@ let draggedItemId = null;
 // 1. הגדרות FIREBASE
 // ==========================================
 const firebaseConfig = {
-  apiKey: "AIzaSyCcxyNvQa-kC-0KDdWKel-2IG9sMI3AuWs",
-  authDomain: "my-dashy-app.firebaseapp.com",
-  projectId: "my-dashy-app",
-  storageBucket: "my-dashy-app.firebasestorage.app",
-  messagingSenderId: "66095384503",
-  appId: "1:66095384503:web:d0747e5c07169a7a6b0a32"
+    apiKey: "AIzaSyYourKeyHere_IF_YOU_HAVE_ONE",
+    authDomain: "your-app.firebaseapp.com",
+    projectId: "your-app",
+    storageBucket: "your-app.appspot.com",
+    messagingSenderId: "123456789",
+    appId: "1:1234:web:1234"
 };
 
 let isFirebaseActive = false;
