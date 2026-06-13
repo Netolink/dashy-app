@@ -1,6 +1,13 @@
 /* ==========================================================================
-   1. VARIABLES & CORE STYLES
+   1. CORE INFRASTRUCTURE & RESET
    ========================================================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Assistant', sans-serif;
+}
+
 :root {
     --bg-main: #0b0f19;
     --panel-bg: rgba(21, 29, 48, 0.7);
@@ -13,22 +20,16 @@
     --text-muted: #9ca3af;
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Assistant', sans-serif;
-}
-
 body {
     background-color: var(--bg-main);
     color: var(--text-main);
     min-height: 100vh;
     padding: 2rem 1rem;
+    direction: rtl; /* מבטיח יישור תקין מימין לשמאל של כל רכיבי האתר */
 }
 
 /* ==========================================================================
-   2. REUSABLE COMPONENTS & UTILITIES (Glassmorphism)
+   2. REUSABLE GLASSMORPHISM DESIGN SYSTEM
    ========================================================================== */
 .glass-panel {
     background: var(--panel-bg);
@@ -79,24 +80,9 @@ body {
     color: #fff;
 }
 
-.form-control {
-    width: 100%;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--panel-border);
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    color: #fff;
-    font-size: 1rem;
-    transition: border-color 0.2s;
-}
-
-.form-control:focus {
-    outline: none;
-    border-color: var(--accent);
-}
-
 .form-group {
     margin-bottom: 1.25rem;
+    text-align: right;
 }
 
 .form-group label {
@@ -107,8 +93,25 @@ body {
     font-weight: 600;
 }
 
+.form-control {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: #fff;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    text-align: right;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
 /* ==========================================================================
-   3. LAYOUT & SECTIONS
+   3. LAYOUT, HEADERS & BREAKS FIX (Prevents image_d07f63.png Collapse)
    ========================================================================== */
 .container {
     max-width: 1200px;
@@ -123,29 +126,16 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 0.75rem 1.5rem;
-}
-
-.popular-section {
-    padding: 1.25rem;
-}
-
-.popular-title {
-    font-weight: 700;
-    margin-bottom: 0.75rem;
-    color: var(--text-muted);
-}
-
-.popular-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
+    width: 100%;
 }
 
 header {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 1.5rem;
     text-align: center;
+    align-items: center;
+    width: 100%;
 }
 
 header h1 {
@@ -157,38 +147,28 @@ header h1 {
     margin-bottom: 0.5rem;
 }
 
+/* סידור קבוצת כפתורי הלשוניות העליונות שלא יקרסו */
 .dashboard-tabs {
     display: flex;
+    flex-direction: row;
     gap: 0.5rem;
     overflow-x: auto;
     padding-bottom: 0.5rem;
+    width: 100%;
+    justify-content: center;
 }
 
 .active-dash-manage {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 1rem;
-    padding: 0.75rem;
-    align-self: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
 }
 
 .dash-manage-title {
     font-weight: 700;
     font-size: 1.1rem;
-}
-
-.edit-icon-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.1rem;
-    opacity: 0.7;
-    transition: opacity 0.2s;
-}
-
-.edit-icon-btn:hover {
-    opacity: 1;
 }
 
 .search-bar-container {
@@ -197,83 +177,44 @@ header h1 {
     margin: 0 auto;
 }
 
-.search-bar {
-    text-align: center;
-}
-
 .actions-row {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
     gap: 0.75rem;
+    width: 100%;
 }
 
-/* settings panel grid inside header */
-.settings-panel {
-    display: none;
-    text-align: right;
-}
-
-.settings-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.25rem;
-}
-
-.settings-group {
-    background: rgba(0,0,0,0.15);
-    padding: 1rem;
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.03);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 1rem;
-}
-
-.settings-info h4 {
-    margin-bottom: 0.25rem;
-}
-
-.settings-info p {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-}
-
-.file-input-label {
-    display: block;
-    text-align: center;
-    padding: 0.6rem;
-    background: rgba(255,255,255,0.03);
-    border: 1px dashed var(--panel-border);
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-.hidden-file-input {
-    display: none;
-}
-
-/* Categories Main Grid Display */
+/* אזור קטגוריות ורשימות כלים דיגיטליים */
 .categories-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 1.5rem;
+    width: 100%;
+}
+
+.popular-section {
+    padding: 1.25rem;
+    width: 100%;
+}
+
+.popular-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
 }
 
 /* ==========================================================================
-   4. MODALS & BOXES SYSTEM
+   4. MODALS SYSTEM (Robust Positioning & Flow)
    ========================================================================== */
 .modal {
-    display: none;
+    display: none; 
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(5, 7, 12, 0.8);
+    background: rgba(5, 7, 12, 0.85);
     backdrop-filter: blur(8px);
     z-index: 1000;
     justify-content: center;
@@ -286,10 +227,13 @@ header h1 {
     border: 1px solid var(--panel-border);
     border-radius: 16px;
     width: 100%;
-    max-width: 450px;
+    max-width: 460px;
     padding: 1.75rem;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
     position: relative;
+    height: auto; /* מונע חיתוך אלמנטים פנימיים */
+    display: flex;
+    flex-direction: column;
 }
 
 .modal-header {
@@ -299,40 +243,41 @@ header h1 {
     color: #fff;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     padding-bottom: 0.75rem;
+    text-align: right;
 }
 
 .modal-buttons {
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-start; /* מותאם ל-RTL, כפתורים מימין לשמאל */
     gap: 0.75rem;
     margin-top: 1.75rem;
 }
 
-.category-select-row {
+/* שורת בחירת אייקון במודאל */
+.icon-selection-row {
     display: flex;
-    gap: 0.5rem;
+    align-items: flex-end;
+    gap: 1rem;
 }
 
-.btn-inline-add {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--panel-border);
-    color: white;
-    padding: 0 1rem;
-    border-radius: 8px;
-    cursor: pointer;
+.icon-selection-row .form-group {
+    flex-grow: 1;
+    margin-bottom: 0;
 }
 
+/* רשת בחירת צבעים לקטגוריות (image_d07f88.png) */
 .color-picker-grid {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 0.5rem;
+    margin-top: 0.5rem;
 }
 
 /* ==========================================================================
-   5. FIXED & CENTERED EMOJI POPOVER SYSTEM (THE FIX)
+   5. ISOLATED EMOJI POPOVER SYSTEM (The Ultimate Structural Fix)
    ========================================================================== */
 .emoji-picker-wrapper {
-    position: relative;
+    position: relative; /* העוגן היחיד שממנו מחושב מיקום הפופאובר */
     display: inline-block;
 }
 
@@ -359,25 +304,24 @@ header h1 {
     display: none; 
     position: absolute; 
     
-    /* ממרכז את חלון הפופאובר בתוך הדיאלוג ומניף אותו מעל שאר השדות */
-    bottom: 95px; 
+    /* מציב אותו מיושר פיקס מעל כפתור הטיל, ללא תלות במיקום המודאל הכללי */
+    bottom: calc(100% + 10px); 
     left: 50%;
     transform: translateX(-50%); 
     
     background: #151d30; 
-    border: 1px solid rgba(255, 255, 255, 0.15); 
+    border: 1px solid rgba(255, 255, 255, 0.2); 
     border-radius: 12px; 
     padding: 1.2rem; 
-    width: 260px; 
+    width: 270px; 
     
-    /* פותר את חיתוך כפתור האישור - מאפשר לחלון לגדול אורגנית לפי התוכן */
+    /* זרימה חופשית של הגובה כדי למנוע היעלמות או חיתוך של כפתור האישור */
     height: auto;
-    max-height: 400px;
+    max-height: 420px;
+    overflow-y: visible; 
     
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); 
-    
-    /* מציף את החלון בוודאות מעל כל שכבות המודאלים */
-    z-index: 9999 !important; 
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7); 
+    z-index: 99999 !important; /* מבטיח ציפה מוחלטת מעל המודאל והקלט */
 }
 
 .emoji-popover-title {
@@ -385,6 +329,7 @@ header h1 {
     color: var(--text-muted);
     margin-bottom: 0.6rem;
     font-weight: 600;
+    text-align: right;
 }
 
 .emoji-presets-grid {
@@ -410,17 +355,21 @@ header h1 {
     transform: scale(1.1);
 }
 
-/* מדור הדבקת אימוג'י מותאם אישית */
+/* אזור הדבקת אימוג'י מותאם אישית וכפתור האישור */
 .emoji-custom-section {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     padding-top: 0.8rem;
     margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .emoji-custom-row {
     display: flex;
     gap: 0.5rem;
     align-items: center;
+    width: 100%;
 }
 
 .emoji-custom-input {
@@ -428,27 +377,35 @@ header h1 {
     background: rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 6px;
-    padding: 0.4rem;
+    padding: 0.45rem;
     color: #fff;
     text-align: center;
     font-size: 1.1rem;
 }
 
-/* עיצוב כפתור האישור הפנימי שנחתך בעבר */
+/* הבטחת הצגה מלאה ועיצוב כפתור האישור הפנימי שנחתך */
 .emoji-custom-save-btn {
     background: var(--accent);
     color: #fff;
     border: none;
     border-radius: 6px;
-    padding: 0.4rem 1rem;
+    padding: 0.45rem 1.2rem;
     cursor: pointer;
     font-weight: 600;
     font-size: 0.9rem;
-    transition: background 0.2s, opacity 0.2s;
+    transition: background 0.2s;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.emoji-custom-save-btn:hover:not(:disabled) {
+    background: var(--accent-hover);
 }
 
 .emoji-custom-save-btn:disabled {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.08);
     color: rgba(255, 255, 255, 0.3);
     cursor: not-allowed;
 }
