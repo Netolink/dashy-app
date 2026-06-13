@@ -947,26 +947,126 @@ const firebaseConfig = {
             reader.readAsText(file);
         }
 
-        function importBookmarksHTML(event) {
-            const file = event.target.files[0]; if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const doc = new DOMParser().parseFromString(e.target.result, 'text/html');
-                const links = doc.querySelectorAll('a');
-                const importedItems = [];
-                links.forEach(link => {
-                    const name = link.textContent.trim(); const url = link.getAttribute('href');
-                    if (url && url.startsWith('http')) {
-                        importedItems.push({ id: 'tool-' + Math.random().toString(36).substr(2,9), name: name || url, url: url });
-                    }
-                });
-                if (importedItems.length > 0) {
-                    getCurrentDashboardData().push({ id: 'cat-' + Date.now(), title: "סימניות מיובאות (" + importedItems.length + ")", icon: "🌐", color: "#a855f7", items: importedItems });
-                    saveData(); renderDashboard(); toggleSettings();
-                }
-            };
-            reader.readAsText(file);
+function importBookmarksHTML(event) {
+    const file = event.target.files[0]; 
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        // פיענוח קובץ ה-HTML של הסימניות
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(e.target.result, 'text/html');
+        
+        // בדיקה אם יש בכלל קישורים בקובץ
+        const allLinks = doc.querySelectorAll('a');
+        if (allLinks.length === 0) {
+            alert("לא נמצאו סימניות תקינות בקובץ שהועלה.");
+            return;
         }
+
+        // שאילת המשתמש לגבי אופן החלוקה (מבנה תיקיות או שיטוח לקטגוריה אחת)
+        const keepStructure = confirm(
+            `נמצאו ${allLinks.length} סימניות.\n\n` +
+            `האם תרצה לפצל אותן אוטומטית לקטגוריות נפרדות לפי מבנה התיקיות המקוריות שלך? \n` +
+            `[אישור - פיצול לפי תיקיות | ביטול - ריכוז הכל תחת 'סימניות מיובאות']`
+        );
+
+        const activeDashboardData = getCurrentDashboardData();
+
+        if (!keepStructure) {
+            // אפשרות 1: המשתמש בחר לרכז הכל במקום אחד
+            const importedItems = [];
+            allLinks.forEach(link => {
+                const url = link.getAttribute('href');
+                const name = link.textContent.trim(); // פתרון בעיה 1: לוקח את הטקסט הגלוי של הלינק
+                
+                if (url && url.startsWith('http')) {
+                    importedItems.push({
+                        id: 'tool-' + Math.random().toString(36).substr(2, 9),
+                        name: name || url,
+                        url: url
+                    });
+                }
+            });
+
+            if (importedItems.length > 0) {
+                activeDashboardData.push({
+                    id: 'cat-' + Date.now(),
+                    title: `סימניות מיובאות (${importedItems.length})`,
+                    icon: "🌐",
+                    color: "#a855f7",
+                    items: importedItems
+                });
+            }
+        } else {
+            // אפשרות 2: חלוקה חכמה לפי תיקיות ותתי-תיקיות
+            // נעבור על כל קישור ונחפש את תיקיית האם הכי קרובה אליו ברמת ה-DOM
+            allLinks.forEach(link => {
+                const url = link.getAttribute('href');
+                const name = link.textContent.trim(); // פתרון בעיה 1: שם הקישור האמיתי ולא ה-URL
+                
+                if (!url || !url.startsWith('http')) return;
+
+                // מציאת השם של התיקייה הקרובה ביותר
+                let folderName = "סימניות ללא קטגוריה";
+                let currentElement = link.closest('dl'); // ה-List שמכיל את האלמנטים
+
+                if (currentElement) {
+                    // מחפשים את ה-h3 הקודם שנמצא בדיוק מעל רשימת הקישורים הזו
+                    let previousHeader = currentElement.previousElementSibling;
+                    while (previousHeader && previousHeader.tagName !== 'H3') {
+                        previousHeader = previousHeader.previousElementSibling;
+                    }
+                    if (previousHeader && previousHeader.tagName === 'H3') {
+                        folderName = previousHeader.textContent.trim();
+                    }
+                }
+
+                // בדיקה אם קטגוריה בשם הזה כבר נוצרה בסבב הייבוא הנוכחי בדשבורד זה
+                let existingCat = activeDashboardData.find(c => c.title === folderName);
+                
+                if (!existingCat) {
+                    // הגרלת צבע רנדומלי מתוך הפלטה שלך כדי שהדשבורד ייראה חי ועשיר
+                    const randomColor = presetColors[Math.floor(Math.random() * presetColors.length)];
+                    
+                    existingCat = {
+                        id: 'cat-' + Math.random().toString(36).substr(2, 9),
+                        title: folderName,
+                        icon: "📁",
+                        color: randomColor,
+                        items: []
+                    };
+                    activeDashboardData.push(existingCat);
+                }
+
+                // דחיפת הכלי לתוך הקטגוריה המתאימה לו
+                existingCat.items.push({
+                    id: 'tool-' + Math.random().toString(36).substr(2, 9),
+                    name: name || url,
+                    url: url
+                });
+            });
+
+            // ניקוי קטגוריות ריקות במידה ונוצרו בטעות
+            allDashboards.forEach(dash => {
+                if(dash.id === currentDashboardId) {
+                    dash.data = dash.data.filter(c => c.items.length > 0);
+                }
+            });
+        }
+
+        // שמירה ורינדור מחדש של המסך
+        saveData();
+        renderDashboard();
+        toggleSettings(); // סגירת תפריט ההגדרות בסיום
+        alert("ייבוא הסימניות החכם הושלם בהצלחה!");
+        
+        // איפוס שדה ה-File כדי לאפשר העלאה חוזרת של אותו קובץ במידת הצורך
+        event.target.value = "";
+    };
+    
+    reader.readAsText(file);
+}
 
         document.getElementById('searchBar').addEventListener('input', (e) => renderDashboard(e.target.value));
 
