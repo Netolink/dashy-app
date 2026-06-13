@@ -176,11 +176,25 @@
         .form-control:focus { border-color: var(--accent); }
         .modal-buttons { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem; }
 
-        /* Emoji Custom Input Trigger Area */
-        .emoji-trigger-container { display: flex; align-items: center; gap: 1rem; }
-        .emoji-preview-box { width: 50px; height: 50px; background: #0f172a; border: 1px solid var(--panel-border); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; cursor: pointer; transition: all 0.2s; }
-        .emoji-preview-box:hover { border-color: var(--accent); background: rgba(56, 189, 248, 0.05); }
-        .emoji-hidden-input { position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none; }
+        /* Native Emoji Input - תיקון קורס פוקוס */
+        .emoji-native-input {
+            width: 60px;
+            height: 50px;
+            background: #0f172a;
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1.6rem;
+            text-align: center;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .emoji-native-input:focus {
+            border-color: var(--accent);
+            background: rgba(56, 189, 248, 0.05);
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+        }
 
         /* Color Picker Grid */
         .color-picker-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem; margin-top: 0.5rem; }
@@ -305,11 +319,8 @@
         <div class="modal-content">
             <div class="modal-header">יצירת קטגוריה חדשה</div>
             <div class="form-group">
-                <label>בחירת אייקון (לחיצה לפתיחת מקלדת אימוג'י)</label>
-                <div class="emoji-trigger-container">
-                    <div class="emoji-preview-box" id="catIconPreview" onclick="triggerEmojiPicker('catHiddenInput', 'catIconPreview')">📁</div>
-                    <input type="text" id="catHiddenInput" class="emoji-hidden-input" value="📁" oninput="updateEmojiPreview('catHiddenInput', 'catIconPreview')">
-                </div>
+                <label>בחירת אייקון (לחץ בפנים לפתיחת תפריט אימוג'י)</label>
+                <input type="text" id="catEmojiInput" class="emoji-native-input" value="📁" oninput="validateAndCleanEmoji(this)" title="לחץ לבחירת אימוג'י">
             </div>
             <div class="form-group"><label>שם הקטגוריה</label><input type="text" id="catName" class="form-control" placeholder="למשל: כללי, פיתוח"></div>
             <div class="form-group">
@@ -328,10 +339,7 @@
             <div class="modal-header">יצירת קטגוריה מהירה</div>
             <div class="form-group">
                 <label>בחירת אייקון</label>
-                <div class="emoji-trigger-container">
-                    <div class="emoji-preview-box" id="inlineCatIconPreview" onclick="triggerEmojiPicker('inlineCatHiddenInput', 'inlineCatIconPreview')">📁</div>
-                    <input type="text" id="inlineCatHiddenInput" class="emoji-hidden-input" value="📁" oninput="updateEmojiPreview('inlineCatHiddenInput', 'inlineCatIconPreview')">
-                </div>
+                <input type="text" id="inlineCatEmojiInput" class="emoji-native-input" value="📁" oninput="validateAndCleanEmoji(this)">
             </div>
             <div class="form-group"><label>שם הקטגוריה</label><input type="text" id="inlineCatName" class="form-control" placeholder="שם הקטגוריה"></div>
             <div class="form-group">
@@ -350,10 +358,7 @@
             <div class="modal-header">יצירת דשבורד חדש</div>
             <div class="form-group">
                 <label>בחירת אייקון</label>
-                <div class="emoji-trigger-container">
-                    <div class="emoji-preview-box" id="newDashIconPreview" onclick="triggerEmojiPicker('newDashHiddenInput', 'newDashIconPreview')">🚀</div>
-                    <input type="text" id="newDashHiddenInput" class="emoji-hidden-input" value="🚀" oninput="updateEmojiPreview('newDashHiddenInput', 'newDashIconPreview')">
-                </div>
+                <input type="text" id="newDashEmojiInput" class="emoji-native-input" value="🚀" oninput="validateAndCleanEmoji(this)">
             </div>
             <div class="form-group"><label>שם הדשבורד</label><input type="text" id="newDashName" class="form-control" placeholder="למשל: עבודה, פרויקט אישי"></div>
             <div class="modal-buttons">
@@ -368,10 +373,7 @@
             <div class="modal-header">עריכת דשבורד</div>
             <div class="form-group">
                 <label>בחירת אייקון</label>
-                <div class="emoji-trigger-container">
-                    <div class="emoji-preview-box" id="editDashIconPreview" onclick="triggerEmojiPicker('editDashHiddenInput', 'editDashIconPreview')">🚀</div>
-                    <input type="text" id="editDashHiddenInput" class="emoji-hidden-input" value="🚀" oninput="updateEmojiPreview('editDashHiddenInput', 'editDashIconPreview')">
-                </div>
+                <input type="text" id="editDashEmojiInput" class="emoji-native-input" oninput="validateAndCleanEmoji(this)">
             </div>
             <div class="form-group"><label>שם הדשבורד</label><input type="text" id="editDashName" class="form-control"></div>
             <div class="modal-buttons">
@@ -387,10 +389,7 @@
             <input type="hidden" id="editCatId">
             <div class="form-group">
                 <label>בחירת אייקון</label>
-                <div class="emoji-trigger-container">
-                    <div class="emoji-preview-box" id="editCatIconPreview" onclick="triggerEmojiPicker('editCatHiddenInput', 'editCatIconPreview')">📁</div>
-                    <input type="text" id="editCatHiddenInput" class="emoji-hidden-input" value="📁" oninput="updateEmojiPreview('editCatHiddenInput', 'editCatIconPreview')">
-                </div>
+                <input type="text" id="editCatEmojiInput" class="emoji-native-input" oninput="validateAndCleanEmoji(this)">
             </div>
             <div class="form-group"><label>שם הקטגוריה</label><input type="text" id="editCatName" class="form-control"></div>
             <div class="form-group">
@@ -424,7 +423,7 @@
         // ==========================================
         // 1. הגדרות FIREBASE
         // ==========================================
-        const firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyCcxyNvQa-kC-0KDdWKel-2IG9sMI3AuWs",
   authDomain: "my-dashy-app.firebaseapp.com",
   projectId: "my-dashy-app",
@@ -528,24 +527,13 @@
             p.style.display = p.style.display === 'block' ? 'none' : 'block'; 
         }
 
-        // הפעלת פוקוס ובחירת אימוג'י נייטיבית
-        function triggerEmojiPicker(inputId, previewId) {
-            const input = document.getElementById(inputId);
-            input.focus();
-            input.select();
-        }
-
-        function updateEmojiPreview(inputId, previewId) {
-            const input = document.getElementById(inputId);
-            const preview = document.getElementById(previewId);
-            
-            // לקיחת התו האחרון שהוזן (כדי לוודא שנבחר אימוג'י יחיד)
-            const value = input.value.trim();
-            if (value) {
-                const emojis = Array.from(value);
-                const lastEmoji = emojis[emojis.length - 1];
-                preview.innerText = lastEmoji;
-                input.value = lastEmoji;
+        // מנקה את השדה הנייטיבי ומשאיר רק את ה-Emoji האחרון שנבחר
+        function validateAndCleanEmoji(inputElement) {
+            const val = inputElement.value.trim();
+            if (val) {
+                const emojiArray = Array.from(val);
+                const lastChar = emojiArray[emojiArray.length - 1];
+                inputElement.value = lastChar; // משאיר רק את האימוג'י הנבחר
             }
         }
 
@@ -618,8 +606,7 @@
             addBtn.className = "add-dash-btn"; addBtn.innerText = "➕ דשבורד חדש";
             addBtn.onclick = () => {
                 document.getElementById('newDashName').value = "";
-                document.getElementById('newDashHiddenInput').value = "🚀";
-                document.getElementById('newDashIconPreview').innerText = "🚀";
+                document.getElementById('newDashEmojiInput').value = "🚀";
                 openModal('dashModal');
             };
             tabsArea.appendChild(addBtn);
@@ -629,7 +616,7 @@
 
         function createNewDashboard() {
             const name = document.getElementById('newDashName').value.trim();
-            const icon = document.getElementById('newDashHiddenInput').value.trim() || "🚀";
+            const icon = document.getElementById('newDashEmojiInput').value.trim() || "🚀";
             if (!name) return;
 
             const newDash = {
@@ -648,8 +635,7 @@
             const activeDash = allDashboards.find(d => d.id === currentDashboardId);
             if (!activeDash) return;
             document.getElementById('editDashName').value = activeDash.title;
-            document.getElementById('editDashHiddenInput').value = activeDash.icon || "🚀";
-            document.getElementById('editDashIconPreview').innerText = activeDash.icon || "🚀";
+            document.getElementById('editDashEmojiInput').value = activeDash.icon || "🚀";
             openModal('editDashModal');
         }
 
@@ -657,7 +643,7 @@
             const activeDash = allDashboards.find(d => d.id === currentDashboardId);
             if (!activeDash) return;
             activeDash.title = document.getElementById('editDashName').value.trim() || activeDash.title;
-            activeDash.icon = document.getElementById('editDashHiddenInput').value.trim() || "🚀";
+            activeDash.icon = document.getElementById('editDashEmojiInput').value.trim() || "🚀";
             saveData(); renderTabs(); renderDashboard(); closeModal('editDashModal');
         }
 
@@ -756,7 +742,7 @@
 
         function saveCategory() {
             const name = document.getElementById('catName').value.trim();
-            const icon = document.getElementById('catHiddenInput').value.trim() || "📁";
+            const icon = document.getElementById('catEmojiInput').value.trim() || "📁";
             if (!name) return;
             
             getCurrentDashboardData().push({ 
@@ -769,20 +755,18 @@
             
             saveData(); renderDashboard(); closeModal('catModal');
             document.getElementById('catName').value = "";
-            document.getElementById('catHiddenInput').value = "📁";
-            document.getElementById('catIconPreview').innerText = "📁";
+            document.getElementById('catEmojiInput').value = "📁";
         }
 
         function openInlineCategoryCreate() {
             document.getElementById('inlineCatName').value = "";
-            document.getElementById('inlineCatHiddenInput').value = "📁";
-            document.getElementById('inlineCatIconPreview').innerText = "📁";
+            document.getElementById('inlineCatEmojiInput').value = "📁";
             openModal('inlineCatModal');
         }
 
         function saveInlineCategory() {
             const name = document.getElementById('inlineCatName').value.trim();
-            const icon = document.getElementById('inlineCatHiddenInput').value.trim() || "📁";
+            const icon = document.getElementById('inlineCatEmojiInput').value.trim() || "📁";
             if (!name) return;
 
             const newCatId = 'cat-' + Date.now();
@@ -807,8 +791,7 @@
             
             document.getElementById('editCatId').value = catId;
             document.getElementById('editCatName').value = category.title;
-            document.getElementById('editCatHiddenInput').value = category.icon || "📁";
-            document.getElementById('editCatIconPreview').innerText = category.icon || "📁";
+            document.getElementById('editCatEmojiInput').value = category.icon || "📁";
             selectedEditCatColor = category.color || presetColors[0];
             
             openModal('editCatModal');
@@ -820,7 +803,7 @@
             if (!category) return;
 
             category.title = document.getElementById('editCatName').value.trim() || category.title;
-            category.icon = document.getElementById('editCatHiddenInput').value.trim() || "📁";
+            category.icon = document.getElementById('editCatEmojiInput').value.trim() || "📁";
             category.color = selectedEditCatColor;
 
             saveData(); renderDashboard(); closeModal('editCatModal');
