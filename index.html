@@ -21,6 +21,7 @@
             --accent-hover: #0ea5e9;
             --danger: #ef4444;
             --success: #22c55e;
+            --popover-bg: #1e293b;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Assistant', sans-serif; }
@@ -168,32 +169,107 @@
 
         /* Modals */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: #1e293b; border: 1px solid var(--panel-border); padding: 2rem; border-radius: 16px; width: 100%; max-width: 450px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        .modal-content { background: #1e293b; border: 1px solid var(--panel-border); padding: 2rem; border-radius: 16px; width: 100%; max-width: 450px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); position: relative; }
         .modal-header { font-size: 1.3rem; font-weight: 700; margin-bottom: 1.5rem; color: var(--accent); }
-        .form-group { margin-bottom: 1.2rem; }
+        .form-group { margin-bottom: 1.2rem; position: relative; }
         .form-group label { display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.9rem; }
         .form-control { width: 100%; padding: 0.75rem 1rem; background: #0f172a; border: 1px solid var(--panel-border); border-radius: 8px; color: var(--text-main); outline: none; font-size: 1rem; }
         .form-control:focus { border-color: var(--accent); }
         .modal-buttons { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem; }
 
-        /* Native Emoji Input - תיקון קורס פוקוס */
-        .emoji-native-input {
-            width: 60px;
-            height: 50px;
+        /* כפתור תצוגת האייקון החדש */
+        .emoji-selector-trigger-btn {
+            width: 55px;
+            height: 52px;
             background: #0f172a;
             border: 1px solid var(--panel-border);
-            border-radius: 8px;
+            border-radius: 10px;
             color: var(--text-main);
-            font-size: 1.6rem;
-            text-align: center;
-            outline: none;
+            font-size: 1.7rem;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: all 0.2s;
         }
-        .emoji-native-input:focus {
+        .emoji-selector-trigger-btn:hover {
             border-color: var(--accent);
             background: rgba(56, 189, 248, 0.05);
-            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+        }
+
+        /* תפריט בחירת האייקונים הפנימי החדש (Popover) */
+        .emoji-popover {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background: var(--popover-bg);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 1rem;
+            width: 260px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            z-index: 2000;
+        }
+        .emoji-popover-title {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        .emoji-presets-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.4rem;
+            margin-bottom: 0.75rem;
+        }
+        .emoji-preset-item {
+            font-size: 1.4rem;
+            padding: 0.2rem;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background 0.1s;
+        }
+        .emoji-preset-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .emoji-custom-section {
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 0.75rem;
+        }
+        .emoji-custom-row {
+            display: flex;
+            gap: 0.4rem;
+        }
+        .emoji-custom-input {
+            flex-grow: 1;
+            padding: 0.4rem;
+            background: #0f172a;
+            border: 1px solid var(--panel-border);
+            border-radius: 6px;
+            color: var(--text-main);
+            font-size: 1.1rem;
+            text-align: center;
+            outline: none;
+        }
+        .emoji-custom-input:focus {
+            border-color: var(--accent);
+        }
+        .emoji-custom-save-btn {
+            background: var(--accent);
+            color: #0f172a;
+            border: none;
+            padding: 0 0.75rem;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .emoji-custom-save-btn:disabled {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-muted);
+            cursor: not-allowed;
         }
 
         /* Color Picker Grid */
@@ -210,6 +286,18 @@
     </style>
 </head>
 <body>
+
+    <div id="emojiPickerPopover" class="emoji-popover">
+        <div class="emoji-popover-title">בחירה מהירה:</div>
+        <div class="emoji-presets-grid" id="emojiPresetsGrid"></div>
+        <div class="emoji-custom-section">
+            <div class="emoji-popover-title">הדבקת אימוג'י מותאם אישית:</div>
+            <div class="emoji-custom-row">
+                <input type="text" id="emojiCustomInput" class="emoji-custom-input" placeholder="הדבק כאן" maxlength="4">
+                <button id="emojiCustomSaveBtn" class="emoji-custom-save-btn" disabled>אישור</button>
+            </div>
+        </div>
+    </div>
 
     <div class="container">
         <div class="auth-bar">
@@ -318,11 +406,17 @@
     <div id="catModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">יצירת קטגוריה חדשה</div>
-            <div class="form-group">
-                <label>בחירת אייקון (לחץ בפנים לפתיחת תפריט אימוג'י)</label>
-                <input type="text" id="catEmojiInput" class="emoji-native-input" value="📁" oninput="validateAndCleanEmoji(this)" title="לחץ לבחירת אימוג'י">
+            <div class="form-group" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                <div>
+                    <label>אייקון קטגוריה</label>
+                    <button type="button" id="catEmojiTriggerBtn" class="emoji-selector-trigger-btn" onclick="toggleEmojiPicker(this, 'catHiddenEmojiInput')">📁</button>
+                    <input type="hidden" id="catHiddenEmojiInput" value="📁">
+                </div>
+                <div style="flex-grow: 1;">
+                    <label>שם הקטגוריה</label>
+                    <input type="text" id="catName" class="form-control" placeholder="למשל: כללי, פיתוח">
+                </div>
             </div>
-            <div class="form-group"><label>שם הקטגוריה</label><input type="text" id="catName" class="form-control" placeholder="למשל: כללי, פיתוח"></div>
             <div class="form-group">
                 <label>צבע קטגוריה</label>
                 <div class="color-picker-grid" id="catColorPicker"></div>
@@ -337,11 +431,17 @@
     <div id="inlineCatModal" class="modal" style="z-index: 1100;">
         <div class="modal-content">
             <div class="modal-header">יצירת קטגוריה מהירה</div>
-            <div class="form-group">
-                <label>בחירת אייקון</label>
-                <input type="text" id="inlineCatEmojiInput" class="emoji-native-input" value="📁" oninput="validateAndCleanEmoji(this)">
+            <div class="form-group" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                <div>
+                    <label>אייקון</label>
+                    <button type="button" id="inlineCatEmojiTriggerBtn" class="emoji-selector-trigger-btn" onclick="toggleEmojiPicker(this, 'inlineCatHiddenEmojiInput')">📁</button>
+                    <input type="hidden" id="inlineCatHiddenEmojiInput" value="📁">
+                </div>
+                <div style="flex-grow: 1;">
+                    <label>שם הקטגוריה</label>
+                    <input type="text" id="inlineCatName" class="form-control" placeholder="שם הקטגוריה">
+                </div>
             </div>
-            <div class="form-group"><label>שם הקטגוריה</label><input type="text" id="inlineCatName" class="form-control" placeholder="שם הקטגוריה"></div>
             <div class="form-group">
                 <label>צבע קטגוריה</label>
                 <div class="color-picker-grid" id="inlineCatColorPicker"></div>
@@ -356,11 +456,17 @@
     <div id="dashModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">יצירת דשבורד חדש</div>
-            <div class="form-group">
-                <label>בחירת אייקון</label>
-                <input type="text" id="newDashEmojiInput" class="emoji-native-input" value="🚀" oninput="validateAndCleanEmoji(this)">
+            <div class="form-group" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                <div>
+                    <label>אייקון</label>
+                    <button type="button" id="newDashEmojiTriggerBtn" class="emoji-selector-trigger-btn" onclick="toggleEmojiPicker(this, 'newDashHiddenEmojiInput')">🚀</button>
+                    <input type="hidden" id="newDashHiddenEmojiInput" value="🚀">
+                </div>
+                <div style="flex-grow: 1;">
+                    <label>שם הדשבורד</label>
+                    <input type="text" id="newDashName" class="form-control" placeholder="למשל: עבודה, פרויקט אישי">
+                </div>
             </div>
-            <div class="form-group"><label>שם הדשבורד</label><input type="text" id="newDashName" class="form-control" placeholder="למשל: עבודה, פרויקט אישי"></div>
             <div class="modal-buttons">
                 <button class="btn" onclick="closeModal('dashModal')">ביטול</button>
                 <button class="btn btn-primary" onclick="createNewDashboard()">יצירת דשבורד</button>
@@ -371,11 +477,17 @@
     <div id="editDashModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">עריכת דשבורד</div>
-            <div class="form-group">
-                <label>בחירת אייקון</label>
-                <input type="text" id="editDashEmojiInput" class="emoji-native-input" oninput="validateAndCleanEmoji(this)">
+            <div class="form-group" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                <div>
+                    <label>אייקון</label>
+                    <button type="button" id="editDashEmojiTriggerBtn" class="emoji-selector-trigger-btn" onclick="toggleEmojiPicker(this, 'editDashHiddenEmojiInput')">🚀</button>
+                    <input type="hidden" id="editDashHiddenEmojiInput" value="🚀">
+                </div>
+                <div style="flex-grow: 1;">
+                    <label>שם הדשבורד</label>
+                    <input type="text" id="editDashName" class="form-control">
+                </div>
             </div>
-            <div class="form-group"><label>שם הדשבורד</label><input type="text" id="editDashName" class="form-control"></div>
             <div class="modal-buttons">
                 <button class="btn" onclick="closeModal('editDashModal')">ביטול</button>
                 <button class="btn btn-primary" onclick="saveEditDashboard()">עדכון דשבורד</button>
@@ -387,11 +499,17 @@
         <div class="modal-content">
             <div class="modal-header">עריכת קטגוריה</div>
             <input type="hidden" id="editCatId">
-            <div class="form-group">
-                <label>בחירת אייקון</label>
-                <input type="text" id="editCatEmojiInput" class="emoji-native-input" oninput="validateAndCleanEmoji(this)">
+            <div class="form-group" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                <div>
+                    <label>אייקון</label>
+                    <button type="button" id="editCatEmojiTriggerBtn" class="emoji-selector-trigger-btn" onclick="toggleEmojiPicker(this, 'editCatHiddenEmojiInput')">📁</button>
+                    <input type="hidden" id="editCatHiddenEmojiInput" value="📁">
+                </div>
+                <div style="flex-grow: 1;">
+                    <label>שם הקטגוריה</label>
+                    <input type="text" id="editCatName" class="form-control">
+                </div>
             </div>
-            <div class="form-group"><label>שם הקטגוריה</label><input type="text" id="editCatName" class="form-control"></div>
             <div class="form-group">
                 <label>צבע קטגוריה</label>
                 <div class="color-picker-grid" id="editCatColorPicker"></div>
@@ -416,21 +534,28 @@
 
     <script>
         const presetColors = ['#38bdf8', '#22c55e', '#a855f7', '#f97316', '#ec4899', '#eab308', '#6366f1', '#14b8a6', '#ef4444', '#94a3b8'];
+        // רשימת אייקוני ברירת מחדל מוכנים מראש לבחירה מהירה
+        const defaultPresetEmojis = ['📁', '🚀', '💻', '⚙️', '📊', '🌐', '🔒', '🎨', '📝', '💡', '🛠️', '🔗', '🤖', '👑', '🔥'];
+        
         let selectedCatColor = presetColors[0];
         let selectedInlineCatColor = presetColors[0];
         let selectedEditCatColor = presetColors[0];
 
+        // משתני עזר לניהול מצב בורר האייקונים
+        let activeEmojiTriggerBtn = null;
+        let activeHiddenInputId = null;
+
         // ==========================================
         // 1. הגדרות FIREBASE
         // ==========================================
-const firebaseConfig = {
-  apiKey: "AIzaSyCcxyNvQa-kC-0KDdWKel-2IG9sMI3AuWs",
-  authDomain: "my-dashy-app.firebaseapp.com",
-  projectId: "my-dashy-app",
-  storageBucket: "my-dashy-app.firebasestorage.app",
-  messagingSenderId: "66095384503",
-  appId: "1:66095384503:web:d0747e5c07169a7a6b0a32"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyYourKeyHere_IF_YOU_HAVE_ONE",
+            authDomain: "your-app.firebaseapp.com",
+            projectId: "your-app",
+            storageBucket: "your-app.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:1234:web:1234"
+        };
 
         let isFirebaseActive = false;
         if (firebaseConfig.apiKey && !firebaseConfig.apiKey.includes("YourKeyHere")) {
@@ -511,39 +636,32 @@ const firebaseConfig = {
         function logout() { auth.signOut().then(() => window.location.reload()); }
 
         // ==========================================
-        // 4. ניהול חלוניות ותצוגות צבעים / אימוג'י
+        // 4. ניהול חלוניות ותצוגות צבעים
         // ==========================================
         function openModal(id) { 
+            closeEmojiPicker();
             document.getElementById(id).style.display = 'flex'; 
             if(id === 'catModal') initColorPicker('catColorPicker', 'cat');
             if(id === 'inlineCatModal') initColorPicker('inlineCatColorPicker', 'inlineCat');
             if(id === 'editCatModal') initColorPicker('editCatColorPicker', 'editCat');
         }
         
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function closeModal(id) { 
+            closeEmojiPicker();
+            document.getElementById(id).style.display = 'none'; 
+        }
         
         function toggleSettings() { 
+            closeEmojiPicker();
             const p = document.getElementById('settingsPanel'); 
             p.style.display = p.style.display === 'block' ? 'none' : 'block'; 
         }
 
-        // מנקה את השדה הנייטיבי ומשאיר רק את ה-Emoji האחרון שנבחר
-        function validateAndCleanEmoji(inputElement) {
-            const val = inputElement.value.trim();
-            if (val) {
-                const emojiArray = Array.from(val);
-                const lastChar = emojiArray[emojiArray.length - 1];
-                inputElement.value = lastChar; // משאיר רק את האימוג'י הנבחר
-            }
-        }
-
-        // בניית פלטת הצבעים המורחבת כולל ה-Custom Picker החדש
         function initColorPicker(containerId, type) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
             let currentSelected = type === 'cat' ? selectedCatColor : (type === 'inlineCat' ? selectedInlineCatColor : selectedEditCatColor);
             
-            // צבעי המערכת המוכנים
             presetColors.forEach(color => {
                 const opt = document.createElement('div');
                 opt.className = `color-option ${color === currentSelected ? 'selected' : ''}`;
@@ -557,7 +675,6 @@ const firebaseConfig = {
                 container.appendChild(opt);
             });
 
-            // כפתור בחירת צבע מותאם אישית (RGB/HEX)
             const customOpt = document.createElement('div');
             const isCustomSelected = !presetColors.includes(currentSelected);
             customOpt.className = `color-option custom-picker-trigger ${isCustomSelected ? 'selected' : ''}`;
@@ -584,6 +701,92 @@ const firebaseConfig = {
         }
 
         // ==========================================
+        // 4ב. מנגנון בורר האייקונים החדש (Inline Popover)
+        // ==========================================
+        function initEmojiPicker() {
+            const grid = document.getElementById('emojiPresetsGrid');
+            grid.innerHTML = '';
+            
+            // יצירת גריד לחצנים לאימוג'ים המובנים
+            defaultPresetEmojis.forEach(emoji => {
+                const item = document.createElement('div');
+                item.className = 'emoji-preset-item';
+                item.innerText = emoji;
+                item.onclick = () => selectEmoji(emoji);
+                grid.appendChild(item);
+            });
+
+            // האזנה לשדה הטקסט החופשי - כפתור האישור יידלק רק אם הוזן תו
+            const customInput = document.getElementById('emojiCustomInput');
+            const saveBtn = document.getElementById('emojiCustomSaveBtn');
+            
+            customInput.oninput = function() {
+                const val = this.value.trim();
+                if (val) {
+                    const emojiArray = Array.from(val);
+                    this.value = emojiArray[emojiArray.length - 1]; // שמירה על תו בודד (אימוג'י מורכב)
+                    saveBtn.disabled = false;
+                } else {
+                    saveBtn.disabled = true;
+                }
+            };
+
+            saveBtn.onclick = function() {
+                const finalEmoji = customInput.value.trim();
+                if (finalEmoji) {
+                    selectEmoji(finalEmoji);
+                }
+            };
+        }
+
+        function toggleEmojiPicker(triggerBtn, targetInputId) {
+            const popover = document.getElementById('emojiPickerPopover');
+            
+            // אם המשתמש לחץ על אותו כפתור כשהוא פתוח - נסגור אותו
+            if (popover.style.display === 'block' && activeEmojiTriggerBtn === triggerBtn) {
+                closeEmojiPicker();
+                return;
+            }
+
+            activeEmojiTriggerBtn = triggerBtn;
+            activeHiddenInputId = targetInputId;
+
+            // איפוס שדה הטקסט המותאם אישית בכניסה
+            document.getElementById('emojiCustomInput').value = '';
+            document.getElementById('emojiCustomSaveBtn').disabled = true;
+
+            // מיקום ה-Popover דינמית צמוד לכפתור שלחצו עליו
+            triggerBtn.parentNode.style.position = 'relative';
+            triggerBtn.parentNode.appendChild(popover);
+            popover.style.display = 'block';
+        }
+
+        function selectEmoji(emoji) {
+            if (activeEmojiTriggerBtn && activeHiddenInputId) {
+                activeEmojiTriggerBtn.innerText = emoji;
+                document.getElementById(activeHiddenInputId).value = emoji;
+            }
+            closeEmojiPicker();
+        }
+
+        function closeEmojiPicker() {
+            const popover = document.getElementById('emojiPickerPopover');
+            popover.style.display = 'none';
+            activeEmojiTriggerBtn = null;
+            activeHiddenInputId = null;
+        }
+
+        // סגירת הבורר בלחיצה מחוץ לתחומי ה-Popover
+        document.addEventListener('mousedown', function(e) {
+            const popover = document.getElementById('emojiPickerPopover');
+            if (popover.style.display === 'block') {
+                if (!popover.contains(e.target) && !activeEmojiTriggerBtn.contains(e.target)) {
+                    closeEmojiPicker();
+                }
+            }
+        });
+
+        // ==========================================
         // 5. ניהול דשבורדים
         // ==========================================
         function renderTabs() {
@@ -606,7 +809,8 @@ const firebaseConfig = {
             addBtn.className = "add-dash-btn"; addBtn.innerText = "➕ דשבורד חדש";
             addBtn.onclick = () => {
                 document.getElementById('newDashName').value = "";
-                document.getElementById('newDashEmojiInput').value = "🚀";
+                document.getElementById('newDashEmojiTriggerBtn').innerText = "🚀";
+                document.getElementById('newDashHiddenEmojiInput').value = "🚀";
                 openModal('dashModal');
             };
             tabsArea.appendChild(addBtn);
@@ -616,7 +820,7 @@ const firebaseConfig = {
 
         function createNewDashboard() {
             const name = document.getElementById('newDashName').value.trim();
-            const icon = document.getElementById('newDashEmojiInput').value.trim() || "🚀";
+            const icon = document.getElementById('newDashHiddenEmojiInput').value.trim() || "🚀";
             if (!name) return;
 
             const newDash = {
@@ -635,7 +839,8 @@ const firebaseConfig = {
             const activeDash = allDashboards.find(d => d.id === currentDashboardId);
             if (!activeDash) return;
             document.getElementById('editDashName').value = activeDash.title;
-            document.getElementById('editDashEmojiInput').value = activeDash.icon || "🚀";
+            document.getElementById('editDashEmojiTriggerBtn').innerText = activeDash.icon || "🚀";
+            document.getElementById('editDashHiddenEmojiInput').value = activeDash.icon || "🚀";
             openModal('editDashModal');
         }
 
@@ -643,7 +848,7 @@ const firebaseConfig = {
             const activeDash = allDashboards.find(d => d.id === currentDashboardId);
             if (!activeDash) return;
             activeDash.title = document.getElementById('editDashName').value.trim() || activeDash.title;
-            activeDash.icon = document.getElementById('editDashEmojiInput').value.trim() || "🚀";
+            activeDash.icon = document.getElementById('editDashHiddenEmojiInput').value.trim() || "🚀";
             saveData(); renderTabs(); renderDashboard(); closeModal('editDashModal');
         }
 
@@ -742,7 +947,7 @@ const firebaseConfig = {
 
         function saveCategory() {
             const name = document.getElementById('catName').value.trim();
-            const icon = document.getElementById('catEmojiInput').value.trim() || "📁";
+            const icon = document.getElementById('catHiddenEmojiInput').value.trim() || "📁";
             if (!name) return;
             
             getCurrentDashboardData().push({ 
@@ -755,18 +960,20 @@ const firebaseConfig = {
             
             saveData(); renderDashboard(); closeModal('catModal');
             document.getElementById('catName').value = "";
-            document.getElementById('catEmojiInput').value = "📁";
+            document.getElementById('catEmojiTriggerBtn').innerText = "📁";
+            document.getElementById('catHiddenEmojiInput').value = "📁";
         }
 
         function openInlineCategoryCreate() {
             document.getElementById('inlineCatName').value = "";
-            document.getElementById('inlineCatEmojiInput').value = "📁";
+            document.getElementById('inlineCatEmojiTriggerBtn').innerText = "📁";
+            document.getElementById('inlineCatHiddenEmojiInput').value = "📁";
             openModal('inlineCatModal');
         }
 
         function saveInlineCategory() {
             const name = document.getElementById('inlineCatName').value.trim();
-            const icon = document.getElementById('inlineCatEmojiInput').value.trim() || "📁";
+            const icon = document.getElementById('inlineCatHiddenEmojiInput').value.trim() || "📁";
             if (!name) return;
 
             const newCatId = 'cat-' + Date.now();
@@ -791,7 +998,8 @@ const firebaseConfig = {
             
             document.getElementById('editCatId').value = catId;
             document.getElementById('editCatName').value = category.title;
-            document.getElementById('editCatEmojiInput').value = category.icon || "📁";
+            document.getElementById('editCatEmojiTriggerBtn').innerText = category.icon || "📁";
+            document.getElementById('editCatHiddenEmojiInput').value = category.icon || "📁";
             selectedEditCatColor = category.color || presetColors[0];
             
             openModal('editCatModal');
@@ -803,7 +1011,7 @@ const firebaseConfig = {
             if (!category) return;
 
             category.title = document.getElementById('editCatName').value.trim() || category.title;
-            category.icon = document.getElementById('editCatEmojiInput').value.trim() || "📁";
+            category.icon = document.getElementById('editCatHiddenEmojiInput').value.trim() || "📁";
             category.color = selectedEditCatColor;
 
             saveData(); renderDashboard(); closeModal('editCatModal');
@@ -827,7 +1035,6 @@ const firebaseConfig = {
             }
         }
 
-        // עריכת מאפייני כלי קיים ומעבר בין קטגוריות
         function openEditItemModal(catId, itemId) {
             const category = getCurrentDashboardData().find(c => c.id === catId);
             if (!category) return;
@@ -839,7 +1046,6 @@ const firebaseConfig = {
             document.getElementById('editItemName').value = item.name;
             document.getElementById('editItemUrl').value = item.url;
 
-            // בניית רשימת הקטגוריות לבחירה בתוך מודל העריכה
             const editSelect = document.getElementById('editItemCategorySelect');
             editSelect.innerHTML = "";
             getCurrentDashboardData().forEach(cat => {
@@ -870,17 +1076,15 @@ const firebaseConfig = {
             const itemIndex = sourceCategory.items.findIndex(i => i.id === itemId);
             if (itemIndex === -1) return;
 
-            // עדכון המידע של הכלי
             const updatedItem = sourceCategory.items[itemIndex];
             updatedItem.name = newName;
             updatedItem.url = newUrl;
 
-            // טיפול במצב של העברת כלי בין קטגוריות
             if (sourceCatId !== newCatId) {
-                sourceCategory.items.splice(itemIndex, 1); // הסרה מהקטגוריה הישנה
+                sourceCategory.items.splice(itemIndex, 1);
                 const targetCategory = getCurrentDashboardData().find(c => c.id === newCatId);
                 if (targetCategory) {
-                    targetCategory.items.push(updatedItem); // הוספה לקטגוריה החדשה
+                    targetCategory.items.push(updatedItem);
                 }
             }
 
@@ -947,122 +1151,168 @@ const firebaseConfig = {
             reader.readAsText(file);
         }
 
+// משתנה גלובלי זמני שיחזיק את הקישורים המנותחים עד שהמשתמש יאשר במודל
+let temporaryParsedBookmarks = [];
+
+function toggleBookmarksFolderSelector(show) {
+    document.getElementById('bookmarksFolderSelectorArea').style.display = show ? 'block' : 'none';
+}
+
 function importBookmarksHTML(event) {
     const file = event.target.files[0]; 
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = function(e) {
-        // פיענוח קובץ ה-HTML של הסימניות
         const parser = new DOMParser();
         const doc = parser.parseFromString(e.target.result, 'text/html');
         
-        // בדיקה אם יש בכלל קישורים בקובץ
         const allLinks = doc.querySelectorAll('a');
         if (allLinks.length === 0) {
             alert("לא נמצאו סימניות תקינות בקובץ שהועלה.");
             return;
         }
 
-        // שאילת המשתמש לגבי אופן החלוקה (מבנה תיקיות או שיטוח לקטגוריה אחת)
-        const keepStructure = confirm(
-            `נמצאו ${allLinks.length} סימניות.\n\n` +
-            `האם תרצה לפצל אותן אוטומטית לקטגוריות נפרדות לפי מבנה התיקיות המקוריות שלך? \n` +
-            `[אישור - פיצול לפי תיקיות | ביטול - ריכוז הכל תחת 'סימניות מיובאות']`
-        );
+        // 1. ניתוח מקדים של כל הקישורים והתיקיות שלהם ושמירה במערך זמני
+        temporaryParsedBookmarks = [];
+        const uniqueFolders = new Set();
 
-        const activeDashboardData = getCurrentDashboardData();
+        allLinks.forEach(link => {
+            const url = link.getAttribute('href');
+            const name = link.textContent.trim();
+            
+            if (!url || !url.startsWith('http')) return;
 
-        if (!keepStructure) {
-            // אפשרות 1: המשתמש בחר לרכז הכל במקום אחד
-            const importedItems = [];
-            allLinks.forEach(link => {
-                const url = link.getAttribute('href');
-                const name = link.textContent.trim(); // פתרון בעיה 1: לוקח את הטקסט הגלוי של הלינק
+            // מציאת התיקייה הקרובה ביותר ברמת ה-DOM
+            let folderName = "סימניות ללא קטגוריה";
+            let currentElement = link.closest('dl');
+
+            if (currentElement) {
+                let previousHeader = currentElement.previousElementSibling;
+                while (previousHeader && previousHeader.tagName !== 'H3') {
+                    previousHeader = previousHeader.previousElementSibling;
+                }
+                if (previousHeader && previousHeader.tagName === 'H3') {
+                    folderName = previousHeader.textContent.trim();
+                }
+            }
+
+            uniqueFolders.add(folderName);
+            
+            temporaryParsedBookmarks.push({
+                name: name || url,
+                url: url,
+                folder: folderName
+            });
+        });
+
+        // 2. רינדור רשימת התיקיות עם Checkboxes בתוך המודל הנייטיבי
+        const checkboxesGrid = document.getElementById('bookmarksFoldersCheckboxesGrid');
+        checkboxesGrid.innerHTML = '';
+        
+        uniqueFolders.forEach(folder => {
+            const label = document.createElement('label');
+            label.style.cssText = "display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.95rem; background: rgba(255,255,255,0.03); padding: 0.4rem; border-radius: 4px;";
+            label.innerHTML = `
+                <input type="checkbox" class="bookmark-folder-checkbox" value="${folder}" checked style="accent-color: var(--accent);">
+                <span>📁 ${folder}</span>
+            `;
+            checkboxesGrid.appendChild(label);
+        });
+
+        // 3. איפוס הגדרות המודל למצב ברירת מחדל ופתיחתו
+        document.querySelector('input[name="bookmarkStructure"][value="split"]').checked = true;
+        document.querySelector('input[name="bookmarkScope"][value="all"]').checked = true;
+        toggleBookmarksFolderSelector(false);
+        
+        openModal('bookmarksImportModal');
+
+        // 4. הגדרת פעולת הלחצן "הפעל ייבוא" בתוך המודל
+        document.getElementById('executeBookmarksImportBtn').onclick = function() {
+            const structureMode = document.querySelector('input[name="bookmarkStructure"]:checked').value; // 'split' או 'flat'
+            const scopeMode = document.querySelector('input[name="bookmarkScope"]:checked').value; // 'all' או 'custom'
+            
+            let foldersToImport = Array.from(uniqueFolders);
+            
+            // אם נבחרה התאמה אישית, נסנן רק את התיקיות שסומנו ב-V
+            if (scopeMode === 'custom') {
+                const checkedBoxes = document.querySelectorAll('.bookmark-folder-checkbox:checked');
+                foldersToImport = Array.from(checkedBoxes).map(box => box.value);
                 
-                if (url && url.startsWith('http')) {
+                if (foldersToImport.length === 0) {
+                    alert("אנא בחר לפחות תיקייה אחת לייבוא או בטל את ההתאמה האישית.");
+                    return;
+                }
+            }
+
+            // סינון הקישורים לפי התיקיות שנבחרו
+            const finalLinksToImport = temporaryParsedBookmarks.filter(item => foldersToImport.includes(item.folder));
+            const activeDashboardData = getCurrentDashboardData();
+
+            if (structureMode === 'flat') {
+                // אפשרות א': ריכוז הכל תחת "סימניות מיובאות"
+                const importedItems = [];
+                finalLinksToImport.forEach(item => {
                     importedItems.push({
                         id: 'tool-' + Math.random().toString(36).substr(2, 9),
-                        name: name || url,
-                        url: url
+                        name: item.name,
+                        url: item.url
+                    });
+                });
+
+                if (importedItems.length > 0) {
+                    activeDashboardData.push({
+                        id: 'cat-' + Date.now(),
+                        title: `סימניות מיובאות (${importedItems.length})`,
+                        icon: "🌐",
+                        color: "#a855f7",
+                        items: importedItems
                     });
                 }
-            });
+            } else {
+                // אפשרות ב': פיצול דינמי לקטגוריות
+                finalLinksToImport.forEach(item => {
+                    let existingCat = activeDashboardData.find(c => c.title === item.folder);
+                    
+                    if (!existingCat) {
+                        const randomColor = presetColors[Math.floor(Math.random() * presetColors.length)];
+                        existingCat = {
+                            id: 'cat-' + Math.random().toString(36).substr(2, 9),
+                            title: item.folder,
+                            icon: "📁",
+                            color: randomColor,
+                            items: []
+                        };
+                        activeDashboardData.push(existingCat);
+                    }
 
-            if (importedItems.length > 0) {
-                activeDashboardData.push({
-                    id: 'cat-' + Date.now(),
-                    title: `סימניות מיובאות (${importedItems.length})`,
-                    icon: "🌐",
-                    color: "#a855f7",
-                    items: importedItems
+                    existingCat.items.push({
+                        id: 'tool-' + Math.random().toString(36).substr(2, 9),
+                        name: item.name,
+                        url: item.url
+                    });
+                });
+
+                // ניקוי קטגוריות ריקות במידה ונוצרו
+                allDashboards.forEach(dash => {
+                    if(dash.id === currentDashboardId) {
+                        dash.data = dash.data.filter(c => c.items.length > 0);
+                    }
                 });
             }
-        } else {
-            // אפשרות 2: חלוקה חכמה לפי תיקיות ותתי-תיקיות
-            // נעבור על כל קישור ונחפש את תיקיית האם הכי קרובה אליו ברמת ה-DOM
-            allLinks.forEach(link => {
-                const url = link.getAttribute('href');
-                const name = link.textContent.trim(); // פתרון בעיה 1: שם הקישור האמיתי ולא ה-URL
-                
-                if (!url || !url.startsWith('http')) return;
 
-                // מציאת השם של התיקייה הקרובה ביותר
-                let folderName = "סימניות ללא קטגוריה";
-                let currentElement = link.closest('dl'); // ה-List שמכיל את האלמנטים
-
-                if (currentElement) {
-                    // מחפשים את ה-h3 הקודם שנמצא בדיוק מעל רשימת הקישורים הזו
-                    let previousHeader = currentElement.previousElementSibling;
-                    while (previousHeader && previousHeader.tagName !== 'H3') {
-                        previousHeader = previousHeader.previousElementSibling;
-                    }
-                    if (previousHeader && previousHeader.tagName === 'H3') {
-                        folderName = previousHeader.textContent.trim();
-                    }
-                }
-
-                // בדיקה אם קטגוריה בשם הזה כבר נוצרה בסבב הייבוא הנוכחי בדשבורד זה
-                let existingCat = activeDashboardData.find(c => c.title === folderName);
-                
-                if (!existingCat) {
-                    // הגרלת צבע רנדומלי מתוך הפלטה שלך כדי שהדשבורד ייראה חי ועשיר
-                    const randomColor = presetColors[Math.floor(Math.random() * presetColors.length)];
-                    
-                    existingCat = {
-                        id: 'cat-' + Math.random().toString(36).substr(2, 9),
-                        title: folderName,
-                        icon: "📁",
-                        color: randomColor,
-                        items: []
-                    };
-                    activeDashboardData.push(existingCat);
-                }
-
-                // דחיפת הכלי לתוך הקטגוריה המתאימה לו
-                existingCat.items.push({
-                    id: 'tool-' + Math.random().toString(36).substr(2, 9),
-                    name: name || url,
-                    url: url
-                });
-            });
-
-            // ניקוי קטגוריות ריקות במידה ונוצרו בטעות
-            allDashboards.forEach(dash => {
-                if(dash.id === currentDashboardId) {
-                    dash.data = dash.data.filter(c => c.items.length > 0);
-                }
-            });
-        }
-
-        // שמירה ורינדור מחדש של המסך
-        saveData();
-        renderDashboard();
-        toggleSettings(); // סגירת תפריט ההגדרות בסיום
-        alert("ייבוא הסימניות החכם הושלם בהצלחה!");
-        
-        // איפוס שדה ה-File כדי לאפשר העלאה חוזרת של אותו קובץ במידת הצורך
-        event.target.value = "";
+            // שמירה, עדכון מסך וסגירה
+            saveData();
+            renderDashboard();
+            closeModal('bookmarksImportModal');
+            toggleSettings(); // סגירת תפריט ההגדרות הראשי
+            
+            alert(`ייבוא סימניות מותאם אישית הושלם! יובאו בהצלחה ${finalLinksToImport.length} סימניות.`);
+            
+            // ניקוי משתנים ושדות
+            temporaryParsedBookmarks = [];
+            event.target.value = "";
+        };
     };
     
     reader.readAsText(file);
@@ -1070,8 +1320,55 @@ function importBookmarksHTML(event) {
 
         document.getElementById('searchBar').addEventListener('input', (e) => renderDashboard(e.target.value));
 
+        // אתחול ראשוני של האפליקציה ובורר האייקונים
+        initEmojiPicker();
         renderTabs();
         renderDashboard();
     </script>
+    <div id="bookmarksImportModal" class="modal" style="z-index: 1300;">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">🌐 הגדרות ייבוא סימניות</div>
+        
+        <div class="form-group">
+            <label style="font-weight: 600; color: var(--accent);">1. כיצד תרצה לסדר את הסימניות?</label>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="radio" name="bookmarkStructure" value="split" checked style="accent-color: var(--accent);">
+                    <span>פיצול אוטומטי לקטגוריות לפי תיקיות המקור</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="radio" name="bookmarkStructure" value="flat" style="accent-color: var(--accent);">
+                    <span>ריכוז כל הקישורים תחת קטגוריה אחת ("סימניות מיובאות")</span>
+                </label>
+            </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.08); margin: 1.5rem 0;">
+
+        <div class="form-group">
+            <label style="font-weight: 600; color: var(--accent);">2. אילו תיקיות תרצה לייבא?</label>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="radio" name="bookmarkScope" value="all" checked onchange="toggleBookmarksFolderSelector(false)" style="accent-color: var(--accent);">
+                    <span>ברירת מחדל - ייבוא של הכל</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="radio" name="bookmarkScope" value="custom" onchange="toggleBookmarksFolderSelector(true)" style="accent-color: var(--accent);">
+                    <span>התאמה אישית (בחירת תיקיות ספציפיות)</span>
+                </label>
+            </div>
+        </div>
+
+        <div id="bookmarksFolderSelectorArea" style="display: none; max-height: 200px; overflow-y: auto; background: #0f172a; padding: 1rem; border-radius: 8px; border: 1px solid var(--panel-border); margin-top: 1rem;">
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: bold;">בחר את התיקציות לייבוא:</div>
+            <div id="bookmarksFoldersCheckboxesGrid" style="display: flex; flex-direction: column; gap: 0.4rem;"></div>
+        </div>
+
+        <div class="modal-buttons" style="margin-top: 2rem;">
+            <button class="btn" onclick="closeModal('bookmarksImportModal')">ביטול</button>
+            <button class="btn btn-primary" id="executeBookmarksImportBtn">הפעל ייבוא</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
