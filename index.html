@@ -15,7 +15,21 @@
 </head>
 <body>
 
+    <!-- פופאובר בחירת אימוג'י -->
+    <div id="emojiPickerPopover" class="emoji-popover">
+        <div class="emoji-popover-title">בחירה מהירה:</div>
+        <div class="emoji-presets-grid" id="emojiPresetsGrid"></div>
+        <div class="emoji-custom-section">
+            <div class="emoji-popover-title">הדבקת אימוג'י מותאם אישית:</div>
+            <div class="emoji-custom-row">
+                <input type="text" id="emojiCustomInput" class="emoji-custom-input" placeholder="הדבק" maxlength="4">
+                <button id="emojiCustomSaveBtn" class="emoji-custom-save-btn" disabled>אישור</button>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
+        <!-- בר התחברות -->
         <div class="auth-bar glass-panel">
             <div id="authStatusLeft">
                 <span style="color: var(--text-muted); font-size: 0.9rem;">מצב: עבודה מקומית (אורח)</span>
@@ -25,6 +39,7 @@
             </div>
         </div>
 
+        <!-- כלים נפוצים -->
         <div id="popularSection" class="popular-section glass-panel">
             <div class="popular-title">🔥 כלים נפוצים ביותר:</div>
             <div class="popular-grid" id="popularGrid"></div>
@@ -51,6 +66,7 @@
                 <button class="btn btn-danger" id="deleteDashBtn" onclick="deleteCurrentDashboard()" style="display:none;">🗑️ מחיקת דשבורד נוכחי</button>
             </div>
 
+            <!-- פאנל הגדרות וגיבויים -->
             <div id="settingsPanel" class="settings-panel glass-panel">
                 <div class="settings-grid">
                     <div class="settings-group">
@@ -84,9 +100,11 @@
             </div>
         </header>
 
+        <!-- גריד קטגוריות ראשי -->
         <main class="categories-grid" id="categoriesGrid"></main>
     </div>
 
+    <!-- מודאל: הוספת כלי חדש -->
     <div id="itemModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">הוספת כלי חדש לדשבורד</div>
@@ -106,6 +124,7 @@
         </div>
     </div>
 
+    <!-- מודאל: עריכת כלי -->
     <div id="editItemModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">עריכת כלי</div>
@@ -124,15 +143,14 @@
         </div>
     </div>
 
+    <!-- מודאל: יצירת קטגוריה -->
     <div id="catModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">יצירת קטגוריה חדשה</div>
             <div class="form-group" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
                 <div>
                     <label>אייקון קטגוריה</label>
-                    <div class="emoji-picker-wrapper">
-                        <button type="button" id="catEmojiTriggerBtn" class="emoji-selector-trigger-btn" onclick="toggleEmojiPicker(this, 'catHiddenEmojiInput')">📁</button>
-                    </div>
+                    <button type="button" id="catEmojiTriggerBtn" class="emoji-selector-trigger-btn" onclick="toggleEmojiPicker(this, 'catHiddenEmojiInput')">📁</button>
                     <input type="hidden" id="catHiddenEmojiInput" value="📁">
                 </div>
                 <div style="flex-grow: 1;">
@@ -151,15 +169,14 @@
         </div>
     </div>
 
+    <!-- מודאל: יצירת קטגוריה מהירה (אינליין) -->
     <div id="inlineCatModal" class="modal" style="z-index: 1100;">
         <div class="modal-content">
             <div class="modal-header">יצירת קטגוריה מהירה</div>
             <div class="form-group" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
                 <div>
                     <label>אייקון</label>
-                    <div class="emoji-picker-wrapper">
-                        <button type="button" id="inlineCatEmojiTriggerBtn" class="emoji-selector-trigger-btn" onclick="toggleEmojiPicker(this, 'inlineCatHiddenEmojiInput')">📁</button>
-                    </div>
+                    <button type="button" id="inlineCatEmojiTriggerBtn" class="emoji-selector-trigger-btn" onclick="toggleEmojiPicker(this, 'inlineCatHiddenEmojiInput')">📁</button>
                     <input type="hidden" id="inlineCatHiddenEmojiInput" value="📁">
                 </div>
                 <div style="flex-grow: 1;">
@@ -178,15 +195,14 @@
         </div>
     </div>
 
+    <!-- מודאל: יצירת דשבורד חדש -->
     <div id="dashModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">יצירת דשבורד חדש</div>
             <div class="form-group" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
                 <div>
                     <label>אייקון</label>
-                    <div class="emoji-picker-wrapper">
-                        <button type="button" id="newDashEmojiTriggerBtn" class="emoji-selector-trigger-btn" onclick="toggleEmojiPicker(this, 'newDashHiddenEmojiInput')">🚀</button>
-                    </div>
+                    <button type="button" id="newDashEmojiTriggerBtn" class="emoji-selector-trigger-btn" onclick="toggleEmojiPicker(this, 'newDashHiddenEmojiInput')">🚀</button>
                     <input type="hidden" id="newDashHiddenEmojiInput" value="🚀">
                 </div>
                 <div style="flex-grow: 1;">
@@ -201,15 +217,14 @@
         </div>
     </div>
 
+    <!-- מודאל: עריכת דשבורד -->
     <div id="editDashModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">עריכת דשבורד</div>
             <div class="form-group" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
                 <div>
                     <label>אייקון</label>
-                    <div class="emoji-picker-wrapper">
-                        <button type="button" id="editDashEmojiTriggerBtn" class="emoji-selector-trigger-btn" onclick="toggleEmojiPicker(this, 'editDashHiddenEmojiInput')">🚀</button>
-                    </div>
+                    <button type="button" id="editDashEmojiTriggerBtn" class="emoji-selector-trigger-btn" onclick="toggleEmojiPicker(this, 'editDashHiddenEmojiInput')">🚀</button>
                     <input type="hidden" id="editDashHiddenEmojiInput" value="🚀">
                 </div>
                 <div style="flex-grow: 1;">
@@ -224,6 +239,7 @@
         </div>
     </div>
 
+    <!-- מודאל: עריכת קטגוריה -->
     <div id="editCatModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">עריכת קטגוריה</div>
@@ -231,9 +247,7 @@
             <div class="form-group" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
                 <div>
                     <label>אייקון</label>
-                    <div class="emoji-picker-wrapper">
-                        <button type="button" id="editCatEmojiTriggerBtn" class="emoji-selector-trigger-btn" onclick="toggleEmojiPicker(this, 'editCatHiddenEmojiInput')">📁</button>
-                    </div>
+                    <button type="button" id="editCatEmojiTriggerBtn" class="emoji-selector-trigger-btn" onclick="toggleEmojiPicker(this, 'editCatHiddenEmojiInput')">📁</button>
                     <input type="hidden" id="editCatHiddenEmojiInput" value="📁">
                 </div>
                 <div style="flex-grow: 1;">
@@ -252,6 +266,7 @@
         </div>
     </div>
 
+    <!-- מודאל: הגדרות ייבוא סימניות -->
     <div id="bookmarksImportModal" class="modal" style="z-index: 1300;">
         <div class="modal-content" style="max-width: 500px;">
             <div class="modal-header">🌐 הגדרות ייבוא סימניות</div>
@@ -293,6 +308,7 @@
         </div>
     </div>
 
+    <!-- מודאל: אישור מחיקה כללי -->
     <div id="confirmModal" class="modal" style="z-index: 1400;">
         <div class="modal-content">
             <div class="modal-header" style="color:var(--danger);" id="confirmHeader">אישור מחיקה</div>
@@ -300,18 +316,6 @@
             <div class="modal-buttons">
                 <button class="btn" id="confirmCancelBtn" onclick="closeModal('confirmModal')">ביטול</button>
                 <button class="btn btn-danger" id="confirmExecuteBtn">אישור</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="emojiPickerPopover" class="emoji-popover">
-        <div class="emoji-popover-title">בחירה מהירה:</div>
-        <div class="emoji-presets-grid" id="emojiPresetsGrid"></div>
-        <div class="emoji-custom-section">
-            <div class="emoji-popover-title">הדבקת אימוג'י מותאם אישית:</div>
-            <div class="emoji-custom-row">
-                <input type="text" id="emojiCustomInput" class="emoji-custom-input" placeholder="הדבק" maxlength="4">
-                <button id="emojiCustomSaveBtn" class="emoji-custom-save-btn" disabled>אישור</button>
             </div>
         </div>
     </div>
