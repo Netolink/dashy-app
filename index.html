@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>דשבורד הכלים שלי - Dashy SaaS</title>
+    <title>כלים דיגיטליים באתר - Dashy SaaS</title>
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -52,7 +52,7 @@
         .user-info { display: flex; align-items: center; gap: 0.75rem; }
         .user-avatar { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--accent); }
 
-        /* Dashboard Tabs (Multi-Dashboard) */
+        /* Dashboard Tabs */
         .dashboard-tabs {
             display: flex;
             gap: 0.5rem;
@@ -72,6 +72,9 @@
             font-weight: 600;
             white-space: nowrap;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
         }
 
         .tab-btn.active {
@@ -96,10 +99,28 @@
         }
         .add-dash-btn:hover { background: rgba(56, 189, 248, 0.1); }
 
+        /* Active Dashboard Management Row */
+        .active-dash-manage {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            background: rgba(30, 41, 59, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            display: inline-flex;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .dash-manage-title { font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .edit-icon-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1rem; transition: color 0.2s; }
+        .edit-icon-btn:hover { color: var(--accent); }
+
         /* Header & Search */
-        header { margin-bottom: 3rem; text-align: center; }
+        header { margin-bottom: 3rem; text-align: center; display: flex; flex-direction: column; align-items: center; }
         header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; background: linear-gradient(to right, #38bdf8, #bae6fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .search-bar-container { max-width: 600px; margin: 0 auto 2rem auto; }
+        .search-bar-container { width: 100%; max-width: 600px; margin: 0 auto 2rem auto; }
         .search-bar { width: 100%; padding: 1rem 1.5rem; border-radius: 50px; border: 1px solid var(--panel-border); background: var(--panel-bg); color: var(--text-main); font-size: 1.1rem; outline: none; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
         .search-bar:focus { border-color: var(--accent); box-shadow: 0 4px 25px rgba(56, 189, 248, 0.2); }
 
@@ -113,7 +134,7 @@
         .btn-danger:hover { background: rgba(239, 68, 68, 0.1); border-color: var(--danger); }
 
         /* Settings Panel */
-        .settings-panel { display: none; background: rgba(30, 41, 59, 0.9); border: 1px solid var(--panel-border); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto; }
+        .settings-panel { display: none; background: rgba(30, 41, 59, 0.9); border: 1px solid var(--panel-border); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; width: 100%; max-width: 600px; }
         .settings-grid { display: flex; flex-direction: column; gap: 1rem; }
         .settings-group { display: flex; align-items: center; justify-content: space-between; background: rgba(15, 23, 42, 0.4); padding: 0.75rem 1rem; border-radius: 8px; gap: 1rem; }
         .settings-info h4 { color: var(--accent); margin-bottom: 0.2rem; }
@@ -122,17 +143,19 @@
         .hidden-file-input { display: none; }
 
         /* Grid */
-        .categories-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem; }
-        .category-card { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 16px; padding: 1.5rem; backdrop-filter: blur(8px); }
+        .categories-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem; width: 100%; }
+        .category-card { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 16px; padding: 1.5rem; backdrop-filter: blur(8px); border-top: 4px solid var(--accent); transition: border-color 0.3s; }
         .category-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem; }
-        .category-title { font-size: 1.2rem; font-weight: 700; color: var(--accent); }
+        .category-title-area { display: flex; align-items: center; gap: 0.5rem; }
+        .category-title { font-size: 1.2rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.4rem; }
+        .category-actions { display: flex; gap: 0.5rem; align-items: center; }
         .delete-cat-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; }
         .delete-cat-btn:hover { color: var(--danger); }
         .items-list { display: flex; flex-direction: column; gap: 0.75rem; }
 
         /* Items */
         .tool-item { display: flex; align-items: center; justify-content: space-between; background: rgba(15, 23, 42, 0.6); border: 1px solid transparent; padding: 0.75rem 1rem; border-radius: 10px; color: var(--text-main); transition: all 0.2s ease; }
-        .tool-item:hover { border-color: rgba(56, 189, 248, 0.3); background: rgba(15, 23, 42, 0.9); transform: translateX(-4px); }
+        .tool-item:hover { border-color: rgba(255, 255, 255, 0.1); background: rgba(15, 23, 42, 0.9); transform: translateX(-4px); }
         .tool-link-area { display: flex; align-items: center; gap: 0.75rem; flex-grow: 1; text-decoration: none; color: inherit; }
         .tool-favicon { width: 24px; height: 24px; border-radius: 4px; background: #fff; padding: 2px; object-fit: contain; }
         .tool-name { font-weight: 600; font-size: 1rem; }
@@ -150,25 +173,15 @@
         .form-control:focus { border-color: var(--accent); }
         .modal-buttons { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem; }
 
-        /* עיצוב שורת בחירת קטגוריה עם כפתור הוספה מהירה */
-        .category-select-row {
-            display: flex;
-            gap: 0.5rem;
-        }
-        .btn-inline-add {
-            background: rgba(56, 189, 248, 0.1);
-            border: 1px dashed var(--accent);
-            color: var(--accent);
-            padding: 0 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-        .btn-inline-add:hover {
-            background: var(--accent);
-            color: #0f172a;
-        }
+        /* Color Picker Grid */
+        .color-picker-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; margin-top: 0.5rem; }
+        .color-option { height: 35px; border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: transform 0.1s; }
+        .color-option:hover { transform: scale(1.05); }
+        .color-option.selected { border-color: #fff; }
+
+        .category-select-row { display: flex; gap: 0.5rem; }
+        .btn-inline-add { background: rgba(56, 189, 248, 0.1); border: 1px dashed var(--accent); color: var(--accent); padding: 0 1rem; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1.1rem; }
+        .btn-inline-add:hover { background: var(--accent); color: #0f172a; }
     </style>
 </head>
 <body>
@@ -186,18 +199,22 @@
         <header>
             <h1>כלים דיגיטליים באתר</h1>
             
-            <div class="dashboard-tabs" id="dashboardTabsArea">
-                </div>
+            <div class="dashboard-tabs" id="dashboardTabsArea"></div>
+            
+            <div class="active-dash-manage" id="activeDashManageRow">
+                <span class="dash-manage-title" id="activeDashTitleDisplay">🚀 דשבורד ראשי</span>
+                <button class="edit-icon-btn" onclick="openEditDashModal()" title="עריכת דשבורד">✏️</button>
+            </div>
             
             <div class="search-bar-container">
-                <input type="text" id="searchBar" class="search-bar" placeholder="חפש כלי מהיר בדשבורד הנוכחי...">
+                <input type="text" id="searchBar" class="search-bar" placeholder="חיפוש מהיר בדשבורד הנוכחי...">
             </div>
 
             <div class="actions-row">
-                <button class="btn btn-primary" onclick="openModal('itemModal')">➕ הוסף כלי חדש</button>
+                <button class="btn btn-primary" onclick="openModal('itemModal')">➕ הוספת כלי חדש</button>
                 <button class="btn" onclick="openModal('catModal')">📁 קטגוריה חדשה</button>
                 <button class="btn" onclick="toggleSettings()">⚙️ גיבוי וייבוא סימניות</button>
-                <button class="btn btn-danger" id="deleteDashBtn" onclick="deleteCurrentDashboard()" style="display:none;">🗑️ מחק דשבורד נוכחי</button>
+                <button class="btn btn-danger" id="deleteDashBtn" onclick="deleteCurrentDashboard()" style="display:none;">🗑️ מחיקת דשבורד נוכחי</button>
             </div>
 
             <div id="settingsPanel" class="settings-panel">
@@ -205,27 +222,27 @@
                     <div class="settings-group">
                         <div class="settings-info">
                             <h4>גיבוי הדשבורד (JSON)</h4>
-                            <p>הורד קובץ עם כל המידע הנוכחי למחשב.</p>
+                            <p>הורדת קובץ עם כל המידע הנוכחי למחשב.</p>
                         </div>
-                        <button class="btn" onclick="exportDataJSON()" style="color: var(--accent);">📥 ייצא קובץ גיבוי</button>
+                        <button class="btn" onclick="exportDataJSON()" style="color: var(--accent);">📥 ייצוא קובץ גיבוי</button>
                     </div>
                     <div class="settings-group">
                         <div class="settings-info">
                             <h4>שחזור דשבורד מגיבוי</h4>
-                            <p>העלה קובץ גיבוי JSON ששמרת בעבר.</p>
+                            <p>העלאת קובץ גיבוי JSON שנשמר בעבר.</p>
                         </div>
                         <label class="file-input-label">
-                            📤 בחר קובץ גיבוי
+                            📤 בחירת קובץ גיבוי
                             <input type="file" id="importJsonInput" class="hidden-file-input" accept=".json" onchange="importDataJSON(event)">
                         </label>
                     </div>
                     <div class="settings-group">
                         <div class="settings-info">
                             <h4>ייבוא סימניות מהדפדפן</h4>
-                            <p>העלה קובץ HTML של Bookmarks שיש לך בדפדפן.</p>
+                            <p>העלאת קובץ HTML של Bookmarks שיש בדפדפן.</p>
                         </div>
                         <label class="file-input-label" style="border-color: var(--success); color: var(--success);">
-                            🌐 ייבא קובץ Bookmarks
+                            🌐 ייבוא קובץ Bookmarks
                             <input type="file" id="importBookmarksInput" class="hidden-file-input" accept=".html" onchange="importBookmarksHTML(event)">
                         </label>
                     </div>
@@ -233,8 +250,7 @@
             </div>
         </header>
 
-        <main class="categories-grid" id="categoriesGrid">
-            </main>
+        <main class="categories-grid" id="categoriesGrid"></main>
     </div>
 
     <div id="itemModal" class="modal">
@@ -243,15 +259,15 @@
             <div class="form-group"><label>שם הכלי</label><input type="text" id="itemName" class="form-control" placeholder="למשל: Speed Insights"></div>
             <div class="form-group"><label>כתובת URL (לינק)</label><input type="url" id="itemUrl" class="form-control" placeholder="https://example.com" dir="ltr"></div>
             <div class="form-group">
-                <label>בחר קטגוריה</label>
+                <label>בחירת קטגוריה</label>
                 <div class="category-select-row">
                     <select id="itemCategorySelect" class="form-control"></select>
-                    <button class="btn-inline-add" title="צור קטגוריה חדשה מיד" onclick="openInlineCategoryCreate()">➕</button>
+                    <button class="btn-inline-add" title="יצירת קטגוריה חדשה מיד" onclick="openInlineCategoryCreate()">➕</button>
                 </div>
             </div>
             <div class="modal-buttons">
                 <button class="btn" onclick="closeModal('itemModal')">ביטול</button>
-                <button class="btn btn-primary" onclick="saveTool()">שמור כלי</button>
+                <button class="btn btn-primary" onclick="saveTool()">שמירת כלי</button>
             </div>
         </div>
     </div>
@@ -259,10 +275,31 @@
     <div id="catModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">יצירת קטגוריה חדשה</div>
+            <div class="form-group"><label>אייקון (אמוג'י)</label><input type="text" id="catIcon" class="form-control" placeholder="📁, 🚀, 🛠️"></div>
             <div class="form-group"><label>שם הקטגוריה</label><input type="text" id="catName" class="form-control" placeholder="למשל: כללי, פיתוח"></div>
+            <div class="form-group">
+                <label>צבע קטגוריה</label>
+                <div class="color-picker-grid" id="catColorPicker"></div>
+            </div>
             <div class="modal-buttons">
                 <button class="btn" onclick="closeModal('catModal')">ביטול</button>
-                <button class="btn btn-primary" onclick="saveCategory()">צור קטגוריה</button>
+                <button class="btn btn-primary" onclick="saveCategory()">יצירת קטגוריה</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="inlineCatModal" class="modal" style="z-index: 1100;">
+        <div class="modal-content">
+            <div class="modal-header">יצירת קטגוריה מהירה</div>
+            <div class="form-group"><label>אייקון (אמוג'י)</label><input type="text" id="inlineCatIcon" class="form-control" placeholder="📁"></div>
+            <div class="form-group"><label>שם הקטגוריה</label><input type="text" id="inlineCatName" class="form-control" placeholder="שם הקטגוריה"></div>
+            <div class="form-group">
+                <label>צבע קטגוריה</label>
+                <div class="color-picker-grid" id="inlineCatColorPicker"></div>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn" onclick="closeModal('inlineCatModal')">ביטול</button>
+                <button class="btn btn-primary" onclick="saveInlineCategory()">הוספה ובחירה</button>
             </div>
         </div>
     </div>
@@ -270,17 +307,64 @@
     <div id="dashModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">יצירת דשבורד חדש</div>
+            <div class="form-group"><label>אייקון (אמוג'י)</label><input type="text" id="newDashIcon" class="form-control" placeholder="🚀"></div>
             <div class="form-group"><label>שם הדשבורד</label><input type="text" id="newDashName" class="form-control" placeholder="למשל: עבודה, פרויקט אישי"></div>
             <div class="modal-buttons">
                 <button class="btn" onclick="closeModal('dashModal')">ביטול</button>
-                <button class="btn btn-primary" onclick="createNewDashboard()">צור דשבורד</button>
+                <button class="btn btn-primary" onclick="createNewDashboard()">יצירת דשבורד</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="editDashModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">עריכת דשבורד</div>
+            <div class="form-group"><label>אייקון (אמוג'י)</label><input type="text" id="editDashIcon" class="form-control"></div>
+            <div class="form-group"><label>שם הדשבורד</label><input type="text" id="editDashName" class="form-control"></div>
+            <div class="modal-buttons">
+                <button class="btn" onclick="closeModal('editDashModal')">ביטול</button>
+                <button class="btn btn-primary" onclick="saveEditDashboard()">עדכון דשבורד</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="editCatModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">עריכת קטגוריה</div>
+            <input type="hidden" id="editCatId">
+            <div class="form-group"><label>אייקון (אמוג'י)</label><input type="text" id="editCatIcon" class="form-control"></div>
+            <div class="form-group"><label>שם הקטגוריה</label><input type="text" id="editCatName" class="form-control"></div>
+            <div class="form-group">
+                <label>צבע קטגוריה</label>
+                <div class="color-picker-grid" id="editCatColorPicker"></div>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn" onclick="closeModal('editCatModal')">ביטול</button>
+                <button class="btn btn-primary" onclick="saveEditCategory()">עדכון קטגוריה</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmModal" class="modal" style="z-index: 1200;">
+        <div class="modal-content">
+            <div class="modal-header" style="color:var(--danger);" id="confirmHeader">אישור מחיקה</div>
+            <p id="confirmMessage" style="margin-bottom: 1.5rem; color: var(--text-main); font-size:1rem;"></p>
+            <div class="modal-buttons">
+                <button class="btn" onclick="closeModal('confirmModal')">ביטול</button>
+                <button class="btn btn-danger" id="confirmExecuteBtn">אישור מחיקה</button>
             </div>
         </div>
     </div>
 
     <script>
+        // פלטת צבעים מוגדרת מראש לבחירה עבור הקטגוריות
+        const presetColors = ['#38bdf8', '#22c55e', '#a855f7', '#f97316', '#ec4899', '#eab308', '#6366f1', '#14b8a6', '#ef4444', '#94a3b8'];
+        let selectedCatColor = presetColors[0];
+        let selectedInlineCatColor = presetColors[0];
+        let selectedEditCatColor = presetColors[0];
+
         // ==========================================
-        // 1. הגדרות FIREBASE — תדביק כאן את שלך
+        // 1. הגדרות FIREBASE
         // ==========================================
 const firebaseConfig = {
   apiKey: "AIzaSyCcxyNvQa-kC-0KDdWKel-2IG9sMI3AuWs",
@@ -301,13 +385,12 @@ const firebaseConfig = {
         const auth = isFirebaseActive ? firebase.auth() : null;
 
         // ==========================================
-        // 2. ניהול המצב של האפליקציה (State)
+        // 2. ניהול מצב האפליקציה (State)
         // ==========================================
         let currentUser = null;
-        
         let allDashboards = [
-            { id: "dash-default", title: "דשבורד ראשי", data: [
-                { id: "cat-1", title: "כללי", items: [{ id: "t1", name: "Google", url: "https://google.com" }] }
+            { id: "dash-default", title: "דשבורד ראשי", icon: "🚀", data: [
+                { id: "cat-1", title: "כללי", icon: "📁", color: "#38bdf8", items: [{ id: "t1", name: "Google", url: "https://google.com" }] }
             ]}
         ];
         let currentDashboardId = "dash-default";
@@ -330,7 +413,7 @@ const firebaseConfig = {
         }
 
         // ==========================================
-        // 3. מנגנון התחברות (Authentication)
+        // 3. התחברות (Authentication)
         // ==========================================
         if (isFirebaseActive) {
             auth.onAuthStateChanged(async (user) => {
@@ -339,10 +422,10 @@ const firebaseConfig = {
                     document.getElementById('authStatusLeft').innerHTML = `
                         <div class="user-info">
                             <img src="${user.photoURL}" class="user-avatar">
-                            <span>מחובר כ: <strong>${user.displayName}</strong></span>
+                            <span>חיבור פעיל: <strong>${user.displayName}</strong></span>
                         </div>
                     `;
-                    document.getElementById('authStatusRight').innerHTML = `<button class="btn" onclick="logout()">התנתק</button>`;
+                    document.getElementById('authStatusRight').innerHTML = `<button class="btn" onclick="logout()">התנתקות</button>`;
                     
                     const doc = await db.collection('users_dashboards').doc(user.uid).get();
                     if (doc.exists) {
@@ -363,7 +446,7 @@ const firebaseConfig = {
         }
 
         function loginWithGoogle() {
-            if (!isFirebaseActive) return alert("אנא הגדר firebaseConfig תחילה.");
+            if (!isFirebaseActive) return alert("נא להגדיר firebaseConfig תחילה.");
             const provider = new firebase.auth.GoogleAuthProvider();
             auth.signInWithPopup(provider).catch(err => alert("שגיאה בהתחברות: " + err.message));
         }
@@ -371,7 +454,53 @@ const firebaseConfig = {
         function logout() { auth.signOut().then(() => window.location.reload()); }
 
         // ==========================================
-        // 4. ניהול דשבורדים מרובים
+        // 4. ניהול חלוניות ותצוגות צבעים
+        // ==========================================
+        function openModal(id) { 
+            document.getElementById(id).style.display = 'flex'; 
+            if(id === 'catModal') initColorPicker('catColorPicker', 'cat');
+            if(id === 'inlineCatModal') initColorPicker('inlineCatColorPicker', 'inlineCat');
+            if(id === 'editCatModal') initColorPicker('editCatColorPicker', 'editCat');
+        }
+        
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        
+        function toggleSettings() { 
+            const p = document.getElementById('settingsPanel'); 
+            p.style.display = p.style.display === 'block' ? 'none' : 'block'; 
+        }
+
+        function initColorPicker(containerId, type) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            let currentSelected = type === 'cat' ? selectedCatColor : (type === 'inlineCat' ? selectedInlineCatColor : selectedEditCatColor);
+            
+            presetColors.forEach(color => {
+                const opt = document.createElement('div');
+                opt.className = `color-option ${color === currentSelected ? 'selected' : ''}`;
+                opt.style.backgroundColor = color;
+                opt.onclick = () => {
+                    if(type === 'cat') selectedCatColor = color;
+                    if(type === 'inlineCat') selectedInlineCatColor = color;
+                    if(type === 'editCat') selectedEditCatColor = color;
+                    initColorPicker(containerId, type);
+                };
+                container.appendChild(opt);
+            });
+        }
+
+        // חלונית אישור מחיקה מותאמת אישית
+        function triggerCustomConfirm(message, onExecute) {
+            document.getElementById('confirmMessage').innerText = message;
+            openModal('confirmModal');
+            document.getElementById('confirmExecuteBtn').onclick = () => {
+                onExecute();
+                closeModal('confirmModal');
+            };
+        }
+
+        // ==========================================
+        // 5. ניהול דשבורדים
         // ==========================================
         function renderTabs() {
             const tabsArea = document.getElementById('dashboardTabsArea');
@@ -379,8 +508,9 @@ const firebaseConfig = {
 
             allDashboards.forEach(dash => {
                 const btn = document.createElement('button');
+                const dIcon = dash.icon || "🚀";
                 btn.className = `tab-btn ${dash.id === currentDashboardId ? 'active' : ''}`;
-                btn.innerText = dash.title;
+                btn.innerHTML = `<span>${dIcon}</span> <span>${dash.title}</span>`;
                 btn.onclick = () => {
                     currentDashboardId = dash.id;
                     saveData(); renderTabs(); renderDashboard();
@@ -398,31 +528,50 @@ const firebaseConfig = {
 
         function createNewDashboard() {
             const name = document.getElementById('newDashName').value.trim();
-            if (!name) return alert("נא להזין שם");
+            const icon = document.getElementById('newDashIcon').value.trim() || "🚀";
+            if (!name) return;
 
             const newDash = {
                 id: 'dash-' + Date.now(),
                 title: name,
-                data: [{ id: 'cat-' + Date.now(), title: "כללי", items: [] }] // יוצר אוטומטית קטגוריית "כללי" ראשונית למניעת באג ריק
+                icon: icon,
+                data: [{ id: 'cat-' + Date.now(), title: "כללי", icon: "📁", color: "#38bdf8", items: [] }]
             };
 
             allDashboards.push(newDash);
             currentDashboardId = newDash.id;
             saveData(); renderTabs(); renderDashboard(); closeModal('dashModal');
             document.getElementById('newDashName').value = "";
+            document.getElementById('newDashIcon').value = "";
+        }
+
+        function openEditDashModal() {
+            const activeDash = allDashboards.find(d => d.id === currentDashboardId);
+            if (!activeDash) return;
+            document.getElementById('editDashName').value = activeDash.title;
+            document.getElementById('editDashIcon').value = activeDash.icon || "🚀";
+            openModal('editDashModal');
+        }
+
+        function saveEditDashboard() {
+            const activeDash = allDashboards.find(d => d.id === currentDashboardId);
+            if (!activeDash) return;
+            activeDash.title = document.getElementById('editDashName').value.trim() || activeDash.title;
+            activeDash.icon = document.getElementById('editDashIcon').value.trim() || "🚀";
+            saveData(); renderTabs(); renderDashboard(); closeModal('editDashModal');
         }
 
         function deleteCurrentDashboard() {
             if (allDashboards.length <= 1) return;
-            if (confirm("האם אתה בטוח שברצונך למחוק את כל הדשבורד הנוכחי?")) {
+            triggerCustomConfirm("האם לאשר מחיקה מלאה של כל הדשבורד הנוכחי וכל הכלים שבתוכו?", () => {
                 allDashboards = allDashboards.filter(d => d.id !== currentDashboardId);
                 currentDashboardId = allDashboards[0].id;
                 saveData(); renderTabs(); renderDashboard();
-            }
+            });
         }
 
         // ==========================================
-        // 5. רנדור וניהול הכלים והקטגוריות
+        // 6. ניהול קטגוריות וכלים
         // ==========================================
         function getCurrentDashboardData() {
             const activeDash = allDashboards.find(d => d.id === currentDashboardId);
@@ -436,12 +585,17 @@ const firebaseConfig = {
             grid.innerHTML = "";
             select.innerHTML = "";
 
+            const activeDash = allDashboards.find(d => d.id === currentDashboardId);
+            if (activeDash) {
+                document.getElementById('activeDashTitleDisplay').innerHTML = `<span>${activeDash.icon || '🚀'}</span> <span>${activeDash.title}</span>`;
+            }
+
             const activeData = getCurrentDashboardData();
 
             activeData.forEach(category => {
                 const option = document.createElement('option');
                 option.value = category.id;
-                option.text = category.title;
+                option.text = (category.icon ? category.icon + " " : "") + category.title;
                 select.appendChild(option);
 
                 const filteredItems = category.items.filter(item => 
@@ -453,12 +607,22 @@ const firebaseConfig = {
 
                 const catCard = document.createElement('div');
                 catCard.className = "category-card";
+                const catColor = category.color || "#38bdf8";
+                catCard.style.borderColor = catColor;
 
                 const catHeader = document.createElement('div');
                 catHeader.className = "category-header";
                 catHeader.innerHTML = `
-                    <div class="category-title">${category.title}</div>
-                    <button class="delete-cat-btn" onclick="deleteCategory('${category.id}')">🗑️ מחק</button>
+                    <div class="category-title-area">
+                        <div class="category-title" style="color: ${catColor};">
+                            <span>${category.icon || '📁'}</span>
+                            <span>${category.title}</span>
+                        </div>
+                        <button class="edit-icon-btn" onclick="openEditCatModal('${category.id}')" style="font-size:0.85rem;">✏️</button>
+                    </div>
+                    <div class="category-actions">
+                        <button class="delete-cat-btn" onclick="deleteCategory('${category.id}')">🗑️ מחיקה</button>
+                    </div>
                 `;
                 catCard.appendChild(catHeader);
 
@@ -487,32 +651,74 @@ const firebaseConfig = {
             });
         }
 
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function toggleSettings() { const p = document.getElementById('settingsPanel'); p.style.display = p.style.display === 'block' ? 'none' : 'block'; }
-
         function saveCategory() {
             const name = document.getElementById('catName').value.trim();
-            if (!name) return alert("אנא הזן שם");
+            const icon = document.getElementById('catIcon').value.trim() || "📁";
+            if (!name) return;
             
-            getCurrentDashboardData().push({ id: 'cat-' + Date.now(), title: name, items: [] });
+            getCurrentDashboardData().push({ 
+                id: 'cat-' + Date.now(), 
+                title: name, 
+                icon: icon, 
+                color: selectedCatColor, 
+                items: [] 
+            });
+            
             saveData(); renderDashboard(); closeModal('catModal');
             document.getElementById('catName').value = "";
+            document.getElementById('catIcon').value = "";
         }
 
-        // פיצ'ר חדש: הוספת קטגוריה מהירה ישירות מתוך פופאפ הכלי
+        // הוספה מהירה של קטגוריה ללא חלוניות דפדפן
         function openInlineCategoryCreate() {
-            const name = prompt("הזן שם עבור הקטגוריה החדשה:");
-            if (!name || !name.trim()) return;
-            
+            openModal('inlineCatModal');
+        }
+
+        function saveInlineCategory() {
+            const name = document.getElementById('inlineCatName').value.trim();
+            const icon = document.getElementById('inlineCatIcon').value.trim() || "📁";
+            if (!name) return;
+
             const newCatId = 'cat-' + Date.now();
-            getCurrentDashboardData().push({ id: newCatId, title: name.trim(), items: [] });
+            getCurrentDashboardData().push({ 
+                id: newCatId, 
+                title: name, 
+                icon: icon, 
+                color: selectedInlineCatColor, 
+                items: [] 
+            });
             
             saveData();
             renderDashboard();
+            closeModal('inlineCatModal');
             
-            // עדכון ה-select הפנימי ובחירה אוטומטית בקטגוריה שנוצרה כעת
             document.getElementById('itemCategorySelect').value = newCatId;
+            document.getElementById('inlineCatName').value = "";
+            document.getElementById('inlineCatIcon').value = "";
+        }
+
+        function openEditCatModal(catId) {
+            const category = getCurrentDashboardData().find(c => c.id === catId);
+            if (!category) return;
+            
+            document.getElementById('editCatId').value = catId;
+            document.getElementById('editCatName').value = category.title;
+            document.getElementById('editCatIcon').value = category.icon || "📁";
+            selectedEditCatColor = category.color || presetColors[0];
+            
+            openModal('editCatModal');
+        }
+
+        function saveEditCategory() {
+            const catId = document.getElementById('editCatId').value;
+            const category = getCurrentDashboardData().find(c => c.id === catId);
+            if (!category) return;
+
+            category.title = document.getElementById('editCatName').value.trim() || category.title;
+            category.icon = document.getElementById('editCatIcon').value.trim() || "📁";
+            category.color = selectedEditCatColor;
+
+            saveData(); renderDashboard(); closeModal('editCatModal');
         }
 
         function saveTool() {
@@ -520,11 +726,8 @@ const firebaseConfig = {
             let url = document.getElementById('itemUrl').value.trim();
             const catId = document.getElementById('itemCategorySelect').value;
 
-            if (!catId) {
-                alert("אין קטגוריה קיימת בדשבורד! לחץ על כפתור ה-➕ שליד השדה כדי ליצור אחת תחילה.");
-                return;
-            }
-            if (!name || !url) return alert("נא למלא שם וכתובת אתר");
+            if (!catId) return;
+            if (!name || !url) return;
             if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
 
             const category = getCurrentDashboardData().find(c => c.id === catId);
@@ -537,33 +740,43 @@ const firebaseConfig = {
         }
 
         function deleteItem(catId, itemId) {
-            const category = getCurrentDashboardData().find(c => c.id === catId);
-            if (category) {
-                category.items = category.items.filter(i => i.id !== itemId);
-                saveData(); renderDashboard();
-            }
+            triggerCustomConfirm("האם לאשר את מחיקת הכלי הנוכחי?", () => {
+                const category = getCurrentDashboardData().find(c => c.id === catId);
+                if (category) {
+                    category.items = category.items.filter(i => i.id !== itemId);
+                    saveData(); renderDashboard();
+                }
+            });
         }
 
-        // חוק 1 המעודכן: הגנה מפני מחיקת הקטגוריה האחרונה
         function deleteCategory(catId) {
             const activeData = getCurrentDashboardData();
             
             if (activeData.length <= 1) {
-                alert("⚠️ אבטחת מערכת: לא ניתן למחוק את הקטגוריה האחרונה שנשארה בדשבורד. חייב להישאר מרחב עבודה אחד לפחות.");
+                // הודעת אבטחה מותאמת ללא אלרט דפדפן
+                document.getElementById('confirmHeader').innerText = "פעולה חסומה";
+                triggerCustomConfirm("אבטחת מערכת: לא ניתן למחוק את הקטגוריה האחרונה שנשארה בדשבורד. יש להשאיר מרחב עבודה אחד לפחות.", () => {});
+                document.getElementById('confirmExecuteBtn').style.display = 'none';
+                // החזרת הכפתור למצב רגיל בעת סגירה
+                document.getElementById('confirmModal').querySelectorAll('.btn')[0].onclick = () => {
+                    closeModal('confirmModal');
+                    document.getElementById('confirmHeader').innerText = "אישור מחיקה";
+                    document.getElementById('confirmExecuteBtn').style.display = 'block';
+                };
                 return;
             }
 
-            if (confirm("האם למחוק קטגוריה זו ואת כל הכלים שבתוכה?")) {
+            triggerCustomConfirm("האם לאשר מחיקה מלאה של קטגוריה זו וכל הכלים שבתוכה?", () => {
                 const activeDash = allDashboards.find(d => d.id === currentDashboardId);
                 if (activeDash) {
                     activeDash.data = activeDash.data.filter(c => c.id !== catId);
                     saveData(); renderDashboard();
                 }
-            }
+            });
         }
 
         // ==========================================
-        // 6. גיבויים וייבוא סימניות
+        // 7. גיבויים וייבוא סימניות
         // ==========================================
         function exportDataJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allDashboards, null, 2));
@@ -581,7 +794,7 @@ const firebaseConfig = {
                         allDashboards = imported;
                         currentDashboardId = allDashboards[0].id;
                         saveData(); renderTabs(); renderDashboard();
-                        alert("הנתונים שוחזרו!"); toggleSettings();
+                        toggleSettings();
                     }
                 } catch (err) { alert("קובץ לא תקין"); }
             };
@@ -602,8 +815,8 @@ const firebaseConfig = {
                     }
                 });
                 if (importedItems.length > 0) {
-                    getCurrentDashboardData().push({ id: 'cat-' + Date.now(), title: "סימניות מיובאות (" + importedItems.length + ")", items: importedItems });
-                    saveData(); renderDashboard(); alert(`ייבאנו ${importedItems.length} סימניות!`); toggleSettings();
+                    getCurrentDashboardData().push({ id: 'cat-' + Date.now(), title: "סימניות מיובאות (" + importedItems.length + ")", icon: "🌐", color: "#a855f7", items: importedItems });
+                    saveData(); renderDashboard(); toggleSettings();
                 }
             };
             reader.readAsText(file);
