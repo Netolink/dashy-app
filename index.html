@@ -154,14 +154,17 @@
         .items-list { display: flex; flex-direction: column; gap: 0.75rem; }
 
         /* Items */
-        .tool-item { display: flex; align-items: center; justify-content: space-between; background: rgba(15, 23, 42, 0.6); border: 1px solid transparent; padding: 0.75rem 1rem; border-radius: 10px; color: var(--text-main); transition: all 0.2s ease; }
+        .tool-item { display: flex; align-items: center; justify-content: space-between; background: rgba(15, 23, 42, 0.6); border: 1px solid transparent; padding: 0.75rem 1rem; border-radius: 10px; color: var(--text-main); transition: all 0.2s ease; position: relative; }
         .tool-item:hover { border-color: rgba(255, 255, 255, 0.1); background: rgba(15, 23, 42, 0.9); transform: translateX(-4px); }
-        .tool-link-area { display: flex; align-items: center; gap: 0.75rem; flex-grow: 1; text-decoration: none; color: inherit; }
+        .tool-link-area { display: flex; align-items: center; gap: 0.75rem; flex-grow: 1; text-decoration: none; color: inherit; padding-left: 3.5rem; }
         .tool-favicon { width: 24px; height: 24px; border-radius: 4px; background: #fff; padding: 2px; object-fit: contain; }
         .tool-name { font-weight: 600; font-size: 1rem; }
-        .delete-item-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 0.2rem; border-radius: 4px; opacity: 0; transition: opacity 0.2s; }
-        .tool-item:hover .delete-item-btn { opacity: 1; }
-        .delete-item-btn:hover { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+        
+        .tool-actions-area { position: absolute; left: 0.75rem; display: flex; gap: 0.3rem; opacity: 0; transition: opacity 0.2s; }
+        .tool-item:hover .tool-actions-area { opacity: 1; }
+        .tool-action-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 0.25rem; border-radius: 4px; }
+        .tool-action-btn:hover { color: var(--accent); background: rgba(255,255,255,0.05); }
+        .tool-action-btn.btn-delete-item:hover { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
 
         /* Modals */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; }
@@ -173,11 +176,19 @@
         .form-control:focus { border-color: var(--accent); }
         .modal-buttons { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem; }
 
+        /* Emoji Custom Input Trigger Area */
+        .emoji-trigger-container { display: flex; align-items: center; gap: 1rem; }
+        .emoji-preview-box { width: 50px; height: 50px; background: #0f172a; border: 1px solid var(--panel-border); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; cursor: pointer; transition: all 0.2s; }
+        .emoji-preview-box:hover { border-color: var(--accent); background: rgba(56, 189, 248, 0.05); }
+        .emoji-hidden-input { position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none; }
+
         /* Color Picker Grid */
-        .color-picker-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; margin-top: 0.5rem; }
-        .color-option { height: 35px; border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: transform 0.1s; }
+        .color-picker-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem; margin-top: 0.5rem; }
+        .color-option { height: 35px; border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: transform 0.1s; position: relative; }
         .color-option:hover { transform: scale(1.05); }
         .color-option.selected { border-color: #fff; }
+        .color-option.custom-picker-trigger { display: flex; align-items: center; justify-content: center; font-size: 1.1rem; background: #0f172a; border: 1px dashed var(--text-muted); color: var(--text-muted); }
+        .color-option input[type="color"] { position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; }
 
         .category-select-row { display: flex; gap: 0.5rem; }
         .btn-inline-add { background: rgba(56, 189, 248, 0.1); border: 1px dashed var(--accent); color: var(--accent); padding: 0 1rem; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1.1rem; }
@@ -272,10 +283,34 @@
         </div>
     </div>
 
+    <div id="editItemModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">עריכת כלי</div>
+            <input type="hidden" id="editItemTargetCatId">
+            <input type="hidden" id="editItemTargetId">
+            <div class="form-group"><label>שם הכלי</label><input type="text" id="editItemName" class="form-control"></div>
+            <div class="form-group"><label>כתובת URL (לינק)</label><input type="url" id="editItemUrl" class="form-control" dir="ltr"></div>
+            <div class="form-group">
+                <label>העברה לקטגוריה</label>
+                <select id="editItemCategorySelect" class="form-control"></select>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn" onclick="closeModal('editItemModal')">ביטול</button>
+                <button class="btn btn-primary" onclick="saveEditTool()">עדכון כלי</button>
+            </div>
+        </div>
+    </div>
+
     <div id="catModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">יצירת קטגוריה חדשה</div>
-            <div class="form-group"><label>אייקון (אמוג'י)</label><input type="text" id="catIcon" class="form-control" placeholder="📁, 🚀, 🛠️"></div>
+            <div class="form-group">
+                <label>בחירת אייקון (לחיצה לפתיחת מקלדת אימוג'י)</label>
+                <div class="emoji-trigger-container">
+                    <div class="emoji-preview-box" id="catIconPreview" onclick="triggerEmojiPicker('catHiddenInput', 'catIconPreview')">📁</div>
+                    <input type="text" id="catHiddenInput" class="emoji-hidden-input" value="📁" oninput="updateEmojiPreview('catHiddenInput', 'catIconPreview')">
+                </div>
+            </div>
             <div class="form-group"><label>שם הקטגוריה</label><input type="text" id="catName" class="form-control" placeholder="למשל: כללי, פיתוח"></div>
             <div class="form-group">
                 <label>צבע קטגוריה</label>
@@ -291,7 +326,13 @@
     <div id="inlineCatModal" class="modal" style="z-index: 1100;">
         <div class="modal-content">
             <div class="modal-header">יצירת קטגוריה מהירה</div>
-            <div class="form-group"><label>אייקון (אמוג'י)</label><input type="text" id="inlineCatIcon" class="form-control" placeholder="📁"></div>
+            <div class="form-group">
+                <label>בחירת אייקון</label>
+                <div class="emoji-trigger-container">
+                    <div class="emoji-preview-box" id="inlineCatIconPreview" onclick="triggerEmojiPicker('inlineCatHiddenInput', 'inlineCatIconPreview')">📁</div>
+                    <input type="text" id="inlineCatHiddenInput" class="emoji-hidden-input" value="📁" oninput="updateEmojiPreview('inlineCatHiddenInput', 'inlineCatIconPreview')">
+                </div>
+            </div>
             <div class="form-group"><label>שם הקטגוריה</label><input type="text" id="inlineCatName" class="form-control" placeholder="שם הקטגוריה"></div>
             <div class="form-group">
                 <label>צבע קטגוריה</label>
@@ -307,7 +348,13 @@
     <div id="dashModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">יצירת דשבורד חדש</div>
-            <div class="form-group"><label>אייקון (אמוג'י)</label><input type="text" id="newDashIcon" class="form-control" placeholder="🚀"></div>
+            <div class="form-group">
+                <label>בחירת אייקון</label>
+                <div class="emoji-trigger-container">
+                    <div class="emoji-preview-box" id="newDashIconPreview" onclick="triggerEmojiPicker('newDashHiddenInput', 'newDashIconPreview')">🚀</div>
+                    <input type="text" id="newDashHiddenInput" class="emoji-hidden-input" value="🚀" oninput="updateEmojiPreview('newDashHiddenInput', 'newDashIconPreview')">
+                </div>
+            </div>
             <div class="form-group"><label>שם הדשבורד</label><input type="text" id="newDashName" class="form-control" placeholder="למשל: עבודה, פרויקט אישי"></div>
             <div class="modal-buttons">
                 <button class="btn" onclick="closeModal('dashModal')">ביטול</button>
@@ -319,7 +366,13 @@
     <div id="editDashModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">עריכת דשבורד</div>
-            <div class="form-group"><label>אייקון (אמוג'י)</label><input type="text" id="editDashIcon" class="form-control"></div>
+            <div class="form-group">
+                <label>בחירת אייקון</label>
+                <div class="emoji-trigger-container">
+                    <div class="emoji-preview-box" id="editDashIconPreview" onclick="triggerEmojiPicker('editDashHiddenInput', 'editDashIconPreview')">🚀</div>
+                    <input type="text" id="editDashHiddenInput" class="emoji-hidden-input" value="🚀" oninput="updateEmojiPreview('editDashHiddenInput', 'editDashIconPreview')">
+                </div>
+            </div>
             <div class="form-group"><label>שם הדשבורד</label><input type="text" id="editDashName" class="form-control"></div>
             <div class="modal-buttons">
                 <button class="btn" onclick="closeModal('editDashModal')">ביטול</button>
@@ -332,7 +385,13 @@
         <div class="modal-content">
             <div class="modal-header">עריכת קטגוריה</div>
             <input type="hidden" id="editCatId">
-            <div class="form-group"><label>אייקון (אמוג'י)</label><input type="text" id="editCatIcon" class="form-control"></div>
+            <div class="form-group">
+                <label>בחירת אייקון</label>
+                <div class="emoji-trigger-container">
+                    <div class="emoji-preview-box" id="editCatIconPreview" onclick="triggerEmojiPicker('editCatHiddenInput', 'editCatIconPreview')">📁</div>
+                    <input type="text" id="editCatHiddenInput" class="emoji-hidden-input" value="📁" oninput="updateEmojiPreview('editCatHiddenInput', 'editCatIconPreview')">
+                </div>
+            </div>
             <div class="form-group"><label>שם הקטגוריה</label><input type="text" id="editCatName" class="form-control"></div>
             <div class="form-group">
                 <label>צבע קטגוריה</label>
@@ -357,7 +416,6 @@
     </div>
 
     <script>
-        // פלטת צבעים מוגדרת מראש לבחירה עבור הקטגוריות
         const presetColors = ['#38bdf8', '#22c55e', '#a855f7', '#f97316', '#ec4899', '#eab308', '#6366f1', '#14b8a6', '#ef4444', '#94a3b8'];
         let selectedCatColor = presetColors[0];
         let selectedInlineCatColor = presetColors[0];
@@ -366,7 +424,7 @@
         // ==========================================
         // 1. הגדרות FIREBASE
         // ==========================================
-const firebaseConfig = {
+        const firebaseConfig = {
   apiKey: "AIzaSyCcxyNvQa-kC-0KDdWKel-2IG9sMI3AuWs",
   authDomain: "my-dashy-app.firebaseapp.com",
   projectId: "my-dashy-app",
@@ -446,7 +504,7 @@ const firebaseConfig = {
         }
 
         function loginWithGoogle() {
-            if (!isFirebaseActive) return alert("נא להגדיר firebaseConfig תחילה.");
+            if (!isFirebaseActive) return alert("אנא הגדר firebaseConfig תחילה.");
             const provider = new firebase.auth.GoogleAuthProvider();
             auth.signInWithPopup(provider).catch(err => alert("שגיאה בהתחברות: " + err.message));
         }
@@ -454,7 +512,7 @@ const firebaseConfig = {
         function logout() { auth.signOut().then(() => window.location.reload()); }
 
         // ==========================================
-        // 4. ניהול חלוניות ותצוגות צבעים
+        // 4. ניהול חלוניות ותצוגות צבעים / אימוג'י
         // ==========================================
         function openModal(id) { 
             document.getElementById(id).style.display = 'flex'; 
@@ -470,11 +528,34 @@ const firebaseConfig = {
             p.style.display = p.style.display === 'block' ? 'none' : 'block'; 
         }
 
+        // הפעלת פוקוס ובחירת אימוג'י נייטיבית
+        function triggerEmojiPicker(inputId, previewId) {
+            const input = document.getElementById(inputId);
+            input.focus();
+            input.select();
+        }
+
+        function updateEmojiPreview(inputId, previewId) {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+            
+            // לקיחת התו האחרון שהוזן (כדי לוודא שנבחר אימוג'י יחיד)
+            const value = input.value.trim();
+            if (value) {
+                const emojis = Array.from(value);
+                const lastEmoji = emojis[emojis.length - 1];
+                preview.innerText = lastEmoji;
+                input.value = lastEmoji;
+            }
+        }
+
+        // בניית פלטת הצבעים המורחבת כולל ה-Custom Picker החדש
         function initColorPicker(containerId, type) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
             let currentSelected = type === 'cat' ? selectedCatColor : (type === 'inlineCat' ? selectedInlineCatColor : selectedEditCatColor);
             
+            // צבעי המערכת המוכנים
             presetColors.forEach(color => {
                 const opt = document.createElement('div');
                 opt.className = `color-option ${color === currentSelected ? 'selected' : ''}`;
@@ -487,9 +568,24 @@ const firebaseConfig = {
                 };
                 container.appendChild(opt);
             });
+
+            // כפתור בחירת צבע מותאם אישית (RGB/HEX)
+            const customOpt = document.createElement('div');
+            const isCustomSelected = !presetColors.includes(currentSelected);
+            customOpt.className = `color-option custom-picker-trigger ${isCustomSelected ? 'selected' : ''}`;
+            if(isCustomSelected) customOpt.style.backgroundColor = currentSelected;
+            customOpt.innerHTML = `🎨<input type="color" value="${currentSelected.startsWith('#') && currentSelected.length === 7 ? currentSelected : '#38bdf8'}" onchange="handleCustomColorChange(this, '${containerId}', '${type}')">`;
+            container.appendChild(customOpt);
         }
 
-        // חלונית אישור מחיקה מותאמת אישית
+        function handleCustomColorChange(picker, containerId, type) {
+            const color = picker.value;
+            if(type === 'cat') selectedCatColor = color;
+            if(type === 'inlineCat') selectedInlineCatColor = color;
+            if(type === 'editCat') selectedEditCatColor = color;
+            initColorPicker(containerId, type);
+        }
+
         function triggerCustomConfirm(message, onExecute) {
             document.getElementById('confirmMessage').innerText = message;
             openModal('confirmModal');
@@ -520,7 +616,12 @@ const firebaseConfig = {
 
             const addBtn = document.createElement('button');
             addBtn.className = "add-dash-btn"; addBtn.innerText = "➕ דשבורד חדש";
-            addBtn.onclick = () => openModal('dashModal');
+            addBtn.onclick = () => {
+                document.getElementById('newDashName').value = "";
+                document.getElementById('newDashHiddenInput').value = "🚀";
+                document.getElementById('newDashIconPreview').innerText = "🚀";
+                openModal('dashModal');
+            };
             tabsArea.appendChild(addBtn);
 
             document.getElementById('deleteDashBtn').style.display = allDashboards.length > 1 ? 'block' : 'none';
@@ -528,7 +629,7 @@ const firebaseConfig = {
 
         function createNewDashboard() {
             const name = document.getElementById('newDashName').value.trim();
-            const icon = document.getElementById('newDashIcon').value.trim() || "🚀";
+            const icon = document.getElementById('newDashHiddenInput').value.trim() || "🚀";
             if (!name) return;
 
             const newDash = {
@@ -541,15 +642,14 @@ const firebaseConfig = {
             allDashboards.push(newDash);
             currentDashboardId = newDash.id;
             saveData(); renderTabs(); renderDashboard(); closeModal('dashModal');
-            document.getElementById('newDashName').value = "";
-            document.getElementById('newDashIcon').value = "";
         }
 
         function openEditDashModal() {
             const activeDash = allDashboards.find(d => d.id === currentDashboardId);
             if (!activeDash) return;
             document.getElementById('editDashName').value = activeDash.title;
-            document.getElementById('editDashIcon').value = activeDash.icon || "🚀";
+            document.getElementById('editDashHiddenInput').value = activeDash.icon || "🚀";
+            document.getElementById('editDashIconPreview').innerText = activeDash.icon || "🚀";
             openModal('editDashModal');
         }
 
@@ -557,7 +657,7 @@ const firebaseConfig = {
             const activeDash = allDashboards.find(d => d.id === currentDashboardId);
             if (!activeDash) return;
             activeDash.title = document.getElementById('editDashName').value.trim() || activeDash.title;
-            activeDash.icon = document.getElementById('editDashIcon').value.trim() || "🚀";
+            activeDash.icon = document.getElementById('editDashHiddenInput').value.trim() || "🚀";
             saveData(); renderTabs(); renderDashboard(); closeModal('editDashModal');
         }
 
@@ -641,7 +741,10 @@ const firebaseConfig = {
                             <img src="${faviconUrl}" class="tool-favicon" onerror="this.src='https://www.google.com/s2/favicons?sz=64&domain=google.com'">
                             <span class="tool-name">${item.name}</span>
                         </a>
-                        <button class="delete-item-btn" onclick="deleteItem('${category.id}', '${item.id}')">🗑️</button>
+                        <div class="tool-actions-area">
+                            <button class="tool-action-btn" onclick="openEditItemModal('${category.id}', '${item.id}')" title="עריכת כלי">✏️</button>
+                            <button class="tool-action-btn btn-delete-item" onclick="deleteItem('${category.id}', '${item.id}')" title="מחיקת כלי">🗑️</button>
+                        </div>
                     `;
                     itemsList.appendChild(itemElement);
                 });
@@ -653,7 +756,7 @@ const firebaseConfig = {
 
         function saveCategory() {
             const name = document.getElementById('catName').value.trim();
-            const icon = document.getElementById('catIcon').value.trim() || "📁";
+            const icon = document.getElementById('catHiddenInput').value.trim() || "📁";
             if (!name) return;
             
             getCurrentDashboardData().push({ 
@@ -666,17 +769,20 @@ const firebaseConfig = {
             
             saveData(); renderDashboard(); closeModal('catModal');
             document.getElementById('catName').value = "";
-            document.getElementById('catIcon').value = "";
+            document.getElementById('catHiddenInput').value = "📁";
+            document.getElementById('catIconPreview').innerText = "📁";
         }
 
-        // הוספה מהירה של קטגוריה ללא חלוניות דפדפן
         function openInlineCategoryCreate() {
+            document.getElementById('inlineCatName').value = "";
+            document.getElementById('inlineCatHiddenInput').value = "📁";
+            document.getElementById('inlineCatIconPreview').innerText = "📁";
             openModal('inlineCatModal');
         }
 
         function saveInlineCategory() {
             const name = document.getElementById('inlineCatName').value.trim();
-            const icon = document.getElementById('inlineCatIcon').value.trim() || "📁";
+            const icon = document.getElementById('inlineCatHiddenInput').value.trim() || "📁";
             if (!name) return;
 
             const newCatId = 'cat-' + Date.now();
@@ -693,8 +799,6 @@ const firebaseConfig = {
             closeModal('inlineCatModal');
             
             document.getElementById('itemCategorySelect').value = newCatId;
-            document.getElementById('inlineCatName').value = "";
-            document.getElementById('inlineCatIcon').value = "";
         }
 
         function openEditCatModal(catId) {
@@ -703,7 +807,8 @@ const firebaseConfig = {
             
             document.getElementById('editCatId').value = catId;
             document.getElementById('editCatName').value = category.title;
-            document.getElementById('editCatIcon').value = category.icon || "📁";
+            document.getElementById('editCatHiddenInput').value = category.icon || "📁";
+            document.getElementById('editCatIconPreview').innerText = category.icon || "📁";
             selectedEditCatColor = category.color || presetColors[0];
             
             openModal('editCatModal');
@@ -715,7 +820,7 @@ const firebaseConfig = {
             if (!category) return;
 
             category.title = document.getElementById('editCatName').value.trim() || category.title;
-            category.icon = document.getElementById('editCatIcon').value.trim() || "📁";
+            category.icon = document.getElementById('editCatHiddenInput').value.trim() || "📁";
             category.color = selectedEditCatColor;
 
             saveData(); renderDashboard(); closeModal('editCatModal');
@@ -739,6 +844,66 @@ const firebaseConfig = {
             }
         }
 
+        // עריכת מאפייני כלי קיים ומעבר בין קטגוריות
+        function openEditItemModal(catId, itemId) {
+            const category = getCurrentDashboardData().find(c => c.id === catId);
+            if (!category) return;
+            const item = category.items.find(i => i.id === itemId);
+            if (!item) return;
+
+            document.getElementById('editItemTargetCatId').value = catId;
+            document.getElementById('editItemTargetId').value = itemId;
+            document.getElementById('editItemName').value = item.name;
+            document.getElementById('editItemUrl').value = item.url;
+
+            // בניית רשימת הקטגוריות לבחירה בתוך מודל העריכה
+            const editSelect = document.getElementById('editItemCategorySelect');
+            editSelect.innerHTML = "";
+            getCurrentDashboardData().forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat.id;
+                opt.text = (cat.icon ? cat.icon + " " : "") + cat.title;
+                if(cat.id === catId) opt.selected = true;
+                editSelect.appendChild(opt);
+            });
+
+            openModal('editItemModal');
+        }
+
+        function saveEditTool() {
+            const sourceCatId = document.getElementById('editItemTargetCatId').value;
+            const itemId = document.getElementById('editItemTargetId').value;
+            const newCatId = document.getElementById('editItemCategorySelect').value;
+            
+            const newName = document.getElementById('editItemName').value.trim();
+            let newUrl = document.getElementById('editItemUrl').value.trim();
+
+            if (!newName || !newUrl) return;
+            if (!/^https?:\/\//i.test(newUrl)) newUrl = 'https://' + newUrl;
+
+            const sourceCategory = getCurrentDashboardData().find(c => c.id === sourceCatId);
+            if (!sourceCategory) return;
+            
+            const itemIndex = sourceCategory.items.findIndex(i => i.id === itemId);
+            if (itemIndex === -1) return;
+
+            // עדכון המידע של הכלי
+            const updatedItem = sourceCategory.items[itemIndex];
+            updatedItem.name = newName;
+            updatedItem.url = newUrl;
+
+            // טיפול במצב של העברת כלי בין קטגוריות
+            if (sourceCatId !== newCatId) {
+                sourceCategory.items.splice(itemIndex, 1); // הסרה מהקטגוריה הישנה
+                const targetCategory = getCurrentDashboardData().find(c => c.id === newCatId);
+                if (targetCategory) {
+                    targetCategory.items.push(updatedItem); // הוספה לקטגוריה החדשה
+                }
+            }
+
+            saveData(); renderDashboard(); closeModal('editItemModal');
+        }
+
         function deleteItem(catId, itemId) {
             triggerCustomConfirm("האם לאשר את מחיקת הכלי הנוכחי?", () => {
                 const category = getCurrentDashboardData().find(c => c.id === catId);
@@ -753,11 +918,9 @@ const firebaseConfig = {
             const activeData = getCurrentDashboardData();
             
             if (activeData.length <= 1) {
-                // הודעת אבטחה מותאמת ללא אלרט דפדפן
                 document.getElementById('confirmHeader').innerText = "פעולה חסומה";
                 triggerCustomConfirm("אבטחת מערכת: לא ניתן למחוק את הקטגוריה האחרונה שנשארה בדשבורד. יש להשאיר מרחב עבודה אחד לפחות.", () => {});
                 document.getElementById('confirmExecuteBtn').style.display = 'none';
-                // החזרת הכפתור למצב רגיל בעת סגירה
                 document.getElementById('confirmModal').querySelectorAll('.btn')[0].onclick = () => {
                     closeModal('confirmModal');
                     document.getElementById('confirmHeader').innerText = "אישור מחיקה";
