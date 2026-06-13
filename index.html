@@ -15,7 +15,6 @@
 </head>
 <body>
 
-    <!-- פופאובר בחירת אימוג'י -->
     <div id="emojiPickerPopover" class="emoji-popover">
         <div class="emoji-popover-title">בחירה מהירה:</div>
         <div class="emoji-presets-grid" id="emojiPresetsGrid"></div>
@@ -29,7 +28,6 @@
     </div>
 
     <div class="container">
-        <!-- בר התחברות -->
         <div class="auth-bar glass-panel">
             <div id="authStatusLeft">
                 <span style="color: var(--text-muted); font-size: 0.9rem;">מצב: עבודה מקומית (אורח)</span>
@@ -39,7 +37,6 @@
             </div>
         </div>
 
-        <!-- כלים נפוצים -->
         <div id="popularSection" class="popular-section glass-panel">
             <div class="popular-title">🔥 כלים נפוצים ביותר:</div>
             <div class="popular-grid" id="popularGrid"></div>
@@ -66,7 +63,6 @@
                 <button class="btn btn-danger" id="deleteDashBtn" onclick="deleteCurrentDashboard()" style="display:none;">🗑️ מחיקת דשבורד נוכחי</button>
             </div>
 
-            <!-- פאנל הגדרות וגיבויים -->
             <div id="settingsPanel" class="settings-panel glass-panel">
                 <div class="settings-grid">
                     <div class="settings-group">
@@ -100,11 +96,9 @@
             </div>
         </header>
 
-        <!-- גריד קטגוריות ראשי -->
         <main class="categories-grid" id="categoriesGrid"></main>
     </div>
 
-    <!-- מודאל: הוספת כלי חדש -->
     <div id="itemModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">הוספת כלי חדש לדשבורד</div>
@@ -124,7 +118,6 @@
         </div>
     </div>
 
-    <!-- מודאל: עריכת כלי -->
     <div id="editItemModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">עריכת כלי</div>
@@ -143,7 +136,6 @@
         </div>
     </div>
 
-    <!-- מודאל: יצירת קטגוריה -->
     <div id="catModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">יצירת קטגוריה חדשה</div>
@@ -169,7 +161,6 @@
         </div>
     </div>
 
-    <!-- מודאל: יצירת קטגוריה מהירה (אינליין) -->
     <div id="inlineCatModal" class="modal" style="z-index: 1100;">
         <div class="modal-content">
             <div class="modal-header">יצירת קטגוריה מהירה</div>
@@ -195,7 +186,6 @@
         </div>
     </div>
 
-    <!-- מודאל: יצירת דשבורד חדש -->
     <div id="dashModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">יצירת דשבורד חדש</div>
@@ -217,7 +207,6 @@
         </div>
     </div>
 
-    <!-- מודאל: עריכת דשבורד -->
     <div id="editDashModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">עריכת דשבורד</div>
@@ -239,7 +228,6 @@
         </div>
     </div>
 
-    <!-- מודאל: עריכת קטגוריה -->
     <div id="editCatModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">עריכת קטגוריה</div>
@@ -266,7 +254,6 @@
         </div>
     </div>
 
-    <!-- מודאל: הגדרות ייבוא סימניות -->
     <div id="bookmarksImportModal" class="modal" style="z-index: 1300;">
         <div class="modal-content" style="max-width: 500px;">
             <div class="modal-header">🌐 הגדרות ייבוא סימניות</div>
@@ -308,7 +295,6 @@
         </div>
     </div>
 
-    <!-- מודאל: אישור מחיקה כללי -->
     <div id="confirmModal" class="modal" style="z-index: 1400;">
         <div class="modal-content">
             <div class="modal-header" style="color:var(--danger);" id="confirmHeader">אישור מחיקה</div>
