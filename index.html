@@ -197,7 +197,7 @@
             background: rgba(56, 189, 248, 0.05);
         }
 
-        /* תפריט בחירת האייקונים הפנימי החדש (Popover) */
+        /* תפריט בחירת האייקונים הפנימי (Popover) */
         .emoji-popover {
             display: none;
             position: absolute;
@@ -521,29 +521,74 @@
         </div>
     </div>
 
-    <div id="confirmModal" class="modal" style="z-index: 1200;">
+    <div id="bookmarksImportModal" class="modal" style="z-index: 1300;">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">🌐 הגדרות ייבוא סימניות</div>
+            
+            <div class="form-group">
+                <label style="font-weight: 600; color: var(--accent);">1. כיצד תרצה לסדר את הסימניות?</label>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="radio" name="bookmarkStructure" value="split" checked style="accent-color: var(--accent);">
+                        <span>פיצול אוטומטי לקטגוריות לפי תיקיות המקור</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="radio" name="bookmarkStructure" value="flat" style="accent-color: var(--accent);">
+                        <span>ריכוז כל הקישורים תחת קטגוריה אחת ("סימניות מיובאות")</span>
+                    </label>
+                </div>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.08); margin: 1.5rem 0;">
+
+            <div class="form-group">
+                <label style="font-weight: 600; color: var(--accent);">2. אילו תיקיות תרצה לייבא?</label>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="radio" name="bookmarkScope" value="all" checked onchange="toggleBookmarksFolderSelector(false)" style="accent-color: var(--accent);">
+                        <span>ברירת מחדל - ייבוא של הכל</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="radio" name="bookmarkScope" value="custom" onchange="toggleBookmarksFolderSelector(true)" style="accent-color: var(--accent);">
+                        <span>התאמה אישית (בחירת תיקיות ספציפיות)</span>
+                    </label>
+                </div>
+            </div>
+
+            <div id="bookmarksFolderSelectorArea" style="display: none; max-height: 200px; overflow-y: auto; background: #0f172a; padding: 1rem; border-radius: 8px; border: 1px solid var(--panel-border); margin-top: 1rem;">
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: bold;">בחר את התיקיות לייבוא:</div>
+                <div id="bookmarksFoldersCheckboxesGrid" style="display: flex; flex-direction: column; gap: 0.4rem;"></div>
+            </div>
+
+            <div class="modal-buttons" style="margin-top: 2rem;">
+                <button class="btn" onclick="closeModal('bookmarksImportModal')">ביטול</button>
+                <button class="btn btn-primary" id="executeBookmarksImportBtn">הפעל ייבוא</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmModal" class="modal" style="z-index: 1400;">
         <div class="modal-content">
             <div class="modal-header" style="color:var(--danger);" id="confirmHeader">אישור מחיקה</div>
             <p id="confirmMessage" style="margin-bottom: 1.5rem; color: var(--text-main); font-size:1rem;"></p>
             <div class="modal-buttons">
-                <button class="btn" onclick="closeModal('confirmModal')">ביטול</button>
-                <button class="btn btn-danger" id="confirmExecuteBtn">אישור מחיקה</button>
+                <button class="btn" id="confirmCancelBtn" onclick="closeModal('confirmModal')">ביטול</button>
+                <button class="btn btn-danger" id="confirmExecuteBtn">אישור</button>
             </div>
         </div>
     </div>
 
     <script>
         const presetColors = ['#38bdf8', '#22c55e', '#a855f7', '#f97316', '#ec4899', '#eab308', '#6366f1', '#14b8a6', '#ef4444', '#94a3b8'];
-        // רשימת אייקוני ברירת מחדל מוכנים מראש לבחירה מהירה
         const defaultPresetEmojis = ['📁', '🚀', '💻', '⚙️', '📊', '🌐', '🔒', '🎨', '📝', '💡', '🛠️', '🔗', '🤖', '👑', '🔥'];
         
         let selectedCatColor = presetColors[0];
         let selectedInlineCatColor = presetColors[0];
         let selectedEditCatColor = presetColors[0];
 
-        // משתני עזר לניהול מצב בורר האייקונים
         let activeEmojiTriggerBtn = null;
         let activeHiddenInputId = null;
+        let temporaryParsedBookmarks = [];
 
         // ==========================================
         // 1. הגדרות FIREBASE
@@ -628,9 +673,9 @@
         }
 
         function loginWithGoogle() {
-            if (!isFirebaseActive) return alert("אנא הגדר firebaseConfig תחילה.");
+            if (!isFirebaseActive) return showAppNotification("הודעת מערכת", "אנא הגדר firebaseConfig תחילה בתוך הקוד.");
             const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider).catch(err => alert("שגיאה בהתחברות: " + err.message));
+            auth.signInWithPopup(provider).catch(err => showAppNotification("שגיאת חיבור", err.message));
         }
 
         function logout() { auth.signOut().then(() => window.location.reload()); }
@@ -691,23 +736,50 @@
             initColorPicker(containerId, type);
         }
 
+        // פונקציית האישור הנייטיבית המשודרגת (מחליפה את confirm הדפדפן)
         function triggerCustomConfirm(message, onExecute) {
+            document.getElementById('confirmHeader').innerText = "אישור פעולה";
+            document.getElementById('confirmHeader').style.color = "var(--danger)";
             document.getElementById('confirmMessage').innerText = message;
+            document.getElementById('confirmCancelBtn').style.display = 'inline-block';
+            
+            const executeBtn = document.getElementById('confirmExecuteBtn');
+            executeBtn.className = "btn btn-danger";
+            executeBtn.textContent = "אישור מחיקה";
+            
             openModal('confirmModal');
-            document.getElementById('confirmExecuteBtn').onclick = () => {
+            
+            executeBtn.onclick = () => {
                 onExecute();
                 closeModal('confirmModal');
             };
         }
 
+        // פונקציית התראות נייטיבית (מחליפה את alert הדפדפן)
+        function showAppNotification(title, message) {
+            document.getElementById('confirmHeader').innerText = title;
+            document.getElementById('confirmHeader').style.color = "var(--accent)";
+            document.getElementById('confirmMessage').innerHTML = message;
+            document.getElementById('confirmCancelBtn').style.display = 'none';
+            
+            const executeBtn = document.getElementById('confirmExecuteBtn');
+            executeBtn.className = "btn btn-primary";
+            executeBtn.textContent = "הבנתי, תודה";
+            
+            openModal('confirmModal');
+            
+            executeBtn.onclick = () => {
+                closeModal('confirmModal');
+            };
+        }
+
         // ==========================================
-        // 4ב. מנגנון בורר האייקונים החדש (Inline Popover)
+        // 4ב. מנגנון בורר האייקונים הפנימי (Inline Popover)
         // ==========================================
         function initEmojiPicker() {
             const grid = document.getElementById('emojiPresetsGrid');
             grid.innerHTML = '';
             
-            // יצירת גריד לחצנים לאימוג'ים המובנים
             defaultPresetEmojis.forEach(emoji => {
                 const item = document.createElement('div');
                 item.className = 'emoji-preset-item';
@@ -716,7 +788,6 @@
                 grid.appendChild(item);
             });
 
-            // האזנה לשדה הטקסט החופשי - כפתור האישור יידלק רק אם הוזן תו
             const customInput = document.getElementById('emojiCustomInput');
             const saveBtn = document.getElementById('emojiCustomSaveBtn');
             
@@ -724,7 +795,7 @@
                 const val = this.value.trim();
                 if (val) {
                     const emojiArray = Array.from(val);
-                    this.value = emojiArray[emojiArray.length - 1]; // שמירה על תו בודד (אימוג'י מורכב)
+                    this.value = emojiArray[emojiArray.length - 1]; 
                     saveBtn.disabled = false;
                 } else {
                     saveBtn.disabled = true;
@@ -733,16 +804,13 @@
 
             saveBtn.onclick = function() {
                 const finalEmoji = customInput.value.trim();
-                if (finalEmoji) {
-                    selectEmoji(finalEmoji);
-                }
+                if (finalEmoji) selectEmoji(finalEmoji);
             };
         }
 
         function toggleEmojiPicker(triggerBtn, targetInputId) {
             const popover = document.getElementById('emojiPickerPopover');
             
-            // אם המשתמש לחץ על אותו כפתור כשהוא פתוח - נסגור אותו
             if (popover.style.display === 'block' && activeEmojiTriggerBtn === triggerBtn) {
                 closeEmojiPicker();
                 return;
@@ -751,11 +819,9 @@
             activeEmojiTriggerBtn = triggerBtn;
             activeHiddenInputId = targetInputId;
 
-            // איפוס שדה הטקסט המותאם אישית בכניסה
             document.getElementById('emojiCustomInput').value = '';
             document.getElementById('emojiCustomSaveBtn').disabled = true;
 
-            // מיקום ה-Popover דינמית צמוד לכפתור שלחצו עליו
             triggerBtn.parentNode.style.position = 'relative';
             triggerBtn.parentNode.appendChild(popover);
             popover.style.display = 'block';
@@ -776,7 +842,6 @@
             activeHiddenInputId = null;
         }
 
-        // סגירת הבורר בלחיצה מחוץ לתחומי ה-Popover
         document.addEventListener('mousedown', function(e) {
             const popover = document.getElementById('emojiPickerPopover');
             if (popover.style.display === 'block') {
@@ -988,7 +1053,6 @@
             saveData();
             renderDashboard();
             closeModal('inlineCatModal');
-            
             document.getElementById('itemCategorySelect').value = newCatId;
         }
 
@@ -1022,8 +1086,7 @@
             let url = document.getElementById('itemUrl').value.trim();
             const catId = document.getElementById('itemCategorySelect').value;
 
-            if (!catId) return;
-            if (!name || !url) return;
+            if (!catId || !name || !url) return;
             if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
 
             const category = getCurrentDashboardData().find(c => c.id === catId);
@@ -1083,9 +1146,7 @@
             if (sourceCatId !== newCatId) {
                 sourceCategory.items.splice(itemIndex, 1);
                 const targetCategory = getCurrentDashboardData().find(c => c.id === newCatId);
-                if (targetCategory) {
-                    targetCategory.items.push(updatedItem);
-                }
+                if (targetCategory) targetCategory.items.push(updatedItem);
             }
 
             saveData(); renderDashboard(); closeModal('editItemModal');
@@ -1105,14 +1166,7 @@
             const activeData = getCurrentDashboardData();
             
             if (activeData.length <= 1) {
-                document.getElementById('confirmHeader').innerText = "פעולה חסומה";
-                triggerCustomConfirm("אבטחת מערכת: לא ניתן למחוק את הקטגוריה האחרונה שנשארה בדשבורד. יש להשאיר מרחב עבודה אחד לפחות.", () => {});
-                document.getElementById('confirmExecuteBtn').style.display = 'none';
-                document.getElementById('confirmModal').querySelectorAll('.btn')[0].onclick = () => {
-                    closeModal('confirmModal');
-                    document.getElementById('confirmHeader').innerText = "אישור מחיקה";
-                    document.getElementById('confirmExecuteBtn').style.display = 'block';
-                };
+                showAppNotification("פעולה חסומה", "אבטחת מערכת: לא ניתן למחוק את הקטגוריה האחרונה שנשארה בדשבורד. יש להשאיר מרחב עבודה אחד לפחות.");
                 return;
             }
 
@@ -1126,7 +1180,7 @@
         }
 
         // ==========================================
-        // 7. גיבויים וייבוא סימניות
+        // 7. גיבויים ומערכת ייבוא סימניות חכמה
         // ==========================================
         function exportDataJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allDashboards, null, 2));
@@ -1146,229 +1200,170 @@
                         saveData(); renderTabs(); renderDashboard();
                         toggleSettings();
                     }
-                } catch (err) { alert("קובץ לא תקין"); }
+                } catch (err) { showAppNotification("שגיאת מבנה", "קובץ הגיבוי שהועלה אינו תקין."); }
             };
             reader.readAsText(file);
         }
 
-// משתנה גלובלי זמני שיחזיק את הקישורים המנותחים עד שהמשתמש יאשר במודל
-let temporaryParsedBookmarks = [];
-
-function toggleBookmarksFolderSelector(show) {
-    document.getElementById('bookmarksFolderSelectorArea').style.display = show ? 'block' : 'none';
-}
-
-function importBookmarksHTML(event) {
-    const file = event.target.files[0]; 
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(e.target.result, 'text/html');
-        
-        const allLinks = doc.querySelectorAll('a');
-        if (allLinks.length === 0) {
-            alert("לא נמצאו סימניות תקינות בקובץ שהועלה.");
-            return;
+        function toggleBookmarksFolderSelector(show) {
+            document.getElementById('bookmarksFolderSelectorArea').style.display = show ? 'block' : 'none';
         }
 
-        // 1. ניתוח מקדים של כל הקישורים והתיקיות שלהם ושמירה במערך זמני
-        temporaryParsedBookmarks = [];
-        const uniqueFolders = new Set();
+        function importBookmarksHTML(event) {
+            const file = event.target.files[0]; 
+            if (!file) return;
 
-        allLinks.forEach(link => {
-            const url = link.getAttribute('href');
-            const name = link.textContent.trim();
-            
-            if (!url || !url.startsWith('http')) return;
-
-            // מציאת התיקייה הקרובה ביותר ברמת ה-DOM
-            let folderName = "סימניות ללא קטגוריה";
-            let currentElement = link.closest('dl');
-
-            if (currentElement) {
-                let previousHeader = currentElement.previousElementSibling;
-                while (previousHeader && previousHeader.tagName !== 'H3') {
-                    previousHeader = previousHeader.previousElementSibling;
-                }
-                if (previousHeader && previousHeader.tagName === 'H3') {
-                    folderName = previousHeader.textContent.trim();
-                }
-            }
-
-            uniqueFolders.add(folderName);
-            
-            temporaryParsedBookmarks.push({
-                name: name || url,
-                url: url,
-                folder: folderName
-            });
-        });
-
-        // 2. רינדור רשימת התיקיות עם Checkboxes בתוך המודל הנייטיבי
-        const checkboxesGrid = document.getElementById('bookmarksFoldersCheckboxesGrid');
-        checkboxesGrid.innerHTML = '';
-        
-        uniqueFolders.forEach(folder => {
-            const label = document.createElement('label');
-            label.style.cssText = "display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.95rem; background: rgba(255,255,255,0.03); padding: 0.4rem; border-radius: 4px;";
-            label.innerHTML = `
-                <input type="checkbox" class="bookmark-folder-checkbox" value="${folder}" checked style="accent-color: var(--accent);">
-                <span>📁 ${folder}</span>
-            `;
-            checkboxesGrid.appendChild(label);
-        });
-
-        // 3. איפוס הגדרות המודל למצב ברירת מחדל ופתיחתו
-        document.querySelector('input[name="bookmarkStructure"][value="split"]').checked = true;
-        document.querySelector('input[name="bookmarkScope"][value="all"]').checked = true;
-        toggleBookmarksFolderSelector(false);
-        
-        openModal('bookmarksImportModal');
-
-        // 4. הגדרת פעולת הלחצן "הפעל ייבוא" בתוך המודל
-        document.getElementById('executeBookmarksImportBtn').onclick = function() {
-            const structureMode = document.querySelector('input[name="bookmarkStructure"]:checked').value; // 'split' או 'flat'
-            const scopeMode = document.querySelector('input[name="bookmarkScope"]:checked').value; // 'all' או 'custom'
-            
-            let foldersToImport = Array.from(uniqueFolders);
-            
-            // אם נבחרה התאמה אישית, נסנן רק את התיקיות שסומנו ב-V
-            if (scopeMode === 'custom') {
-                const checkedBoxes = document.querySelectorAll('.bookmark-folder-checkbox:checked');
-                foldersToImport = Array.from(checkedBoxes).map(box => box.value);
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(e.target.result, 'text/html');
                 
-                if (foldersToImport.length === 0) {
-                    alert("אנא בחר לפחות תיקייה אחת לייבוא או בטל את ההתאמה האישית.");
+                const allLinks = doc.querySelectorAll('a');
+                if (allLinks.length === 0) {
+                    showAppNotification("שגיאה בייבוא", "לא נמצאו סימניות תקינות בקובץ שהועלה.");
+                    event.target.value = "";
                     return;
                 }
-            }
 
-            // סינון הקישורים לפי התיקיות שנבחרו
-            const finalLinksToImport = temporaryParsedBookmarks.filter(item => foldersToImport.includes(item.folder));
-            const activeDashboardData = getCurrentDashboardData();
+                temporaryParsedBookmarks = [];
+                const uniqueFolders = new Set();
 
-            if (structureMode === 'flat') {
-                // אפשרות א': ריכוז הכל תחת "סימניות מיובאות"
-                const importedItems = [];
-                finalLinksToImport.forEach(item => {
-                    importedItems.push({
-                        id: 'tool-' + Math.random().toString(36).substr(2, 9),
-                        name: item.name,
-                        url: item.url
-                    });
-                });
-
-                if (importedItems.length > 0) {
-                    activeDashboardData.push({
-                        id: 'cat-' + Date.now(),
-                        title: `סימניות מיובאות (${importedItems.length})`,
-                        icon: "🌐",
-                        color: "#a855f7",
-                        items: importedItems
-                    });
-                }
-            } else {
-                // אפשרות ב': פיצול דינמי לקטגוריות
-                finalLinksToImport.forEach(item => {
-                    let existingCat = activeDashboardData.find(c => c.title === item.folder);
+                allLinks.forEach(link => {
+                    const url = link.getAttribute('href');
+                    const name = link.textContent.trim();
                     
-                    if (!existingCat) {
-                        const randomColor = presetColors[Math.floor(Math.random() * presetColors.length)];
-                        existingCat = {
-                            id: 'cat-' + Math.random().toString(36).substr(2, 9),
-                            title: item.folder,
-                            icon: "📁",
-                            color: randomColor,
-                            items: []
-                        };
-                        activeDashboardData.push(existingCat);
+                    if (!url || !url.startsWith('http')) return;
+
+                    let folderName = "סימניות ללא קטגוריה";
+                    let currentElement = link.closest('dl');
+
+                    if (currentElement) {
+                        let previousHeader = currentElement.previousElementSibling;
+                        while (previousHeader && previousHeader.tagName !== 'H3') {
+                            previousHeader = previousHeader.previousElementSibling;
+                        }
+                        if (previousHeader && previousHeader.tagName === 'H3') {
+                            folderName = previousHeader.textContent.trim();
+                        }
                     }
 
-                    existingCat.items.push({
-                        id: 'tool-' + Math.random().toString(36).substr(2, 9),
-                        name: item.name,
-                        url: item.url
+                    uniqueFolders.add(folderName);
+                    
+                    temporaryParsedBookmarks.push({
+                        name: name || url,
+                        url: url,
+                        folder: folderName
                     });
                 });
 
-                // ניקוי קטגוריות ריקות במידה ונוצרו
-                allDashboards.forEach(dash => {
-                    if(dash.id === currentDashboardId) {
-                        dash.data = dash.data.filter(c => c.items.length > 0);
-                    }
+                const checkboxesGrid = document.getElementById('bookmarksFoldersCheckboxesGrid');
+                checkboxesGrid.innerHTML = '';
+                
+                uniqueFolders.forEach(folder => {
+                    const label = document.createElement('label');
+                    label.style.cssText = "display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.95rem; background: rgba(255,255,255,0.03); padding: 0.4rem; border-radius: 4px;";
+                    label.innerHTML = `
+                        <input type="checkbox" class="bookmark-folder-checkbox" value="${folder}" checked style="accent-color: var(--accent);">
+                        <span>📁 ${folder}</span>
+                    `;
+                    checkboxesGrid.appendChild(label);
                 });
-            }
 
-            // שמירה, עדכון מסך וסגירה
-            saveData();
-            renderDashboard();
-            closeModal('bookmarksImportModal');
-            toggleSettings(); // סגירת תפריט ההגדרות הראשי
+                document.querySelector('input[name="bookmarkStructure"][value="split"]').checked = true;
+                document.querySelector('input[name="bookmarkScope"][value="all"]').checked = true;
+                toggleBookmarksFolderSelector(false);
+                
+                openModal('bookmarksImportModal');
+
+                document.getElementById('executeBookmarksImportBtn').onclick = function() {
+                    const structureMode = document.querySelector('input[name="bookmarkStructure"]:checked').value; 
+                    const scopeMode = document.querySelector('input[name="bookmarkScope"]:checked').value; 
+                    
+                    let foldersToImport = Array.from(uniqueFolders);
+                    
+                    if (scopeMode === 'custom') {
+                        const checkedBoxes = document.querySelectorAll('.bookmark-folder-checkbox:checked');
+                        foldersToImport = Array.from(checkedBoxes).map(box => box.value);
+                        
+                        if (foldersToImport.length === 0) {
+                            showAppNotification("שימו לב", "יש לבחור לפחות תיקייה אחת לייבוא או לבטל את מצב ההתאמה האישית.");
+                            return;
+                        }
+                    }
+
+                    const finalLinksToImport = temporaryParsedBookmarks.filter(item => foldersToImport.includes(item.folder));
+                    const activeDashboardData = getCurrentDashboardData();
+
+                    if (structureMode === 'flat') {
+                        const importedItems = [];
+                        finalLinksToImport.forEach(item => {
+                            importedItems.push({
+                                id: 'tool-' + Math.random().toString(36).substr(2, 9),
+                                name: item.name,
+                                url: item.url
+                            });
+                        });
+
+                        if (importedItems.length > 0) {
+                            activeDashboardData.push({
+                                id: 'cat-' + Date.now(),
+                                title: `סימניות מיובאות (${importedItems.length})`,
+                                icon: "🌐",
+                                color: "#a855f7",
+                                items: importedItems
+                            });
+                        }
+                    } else {
+                        finalLinksToImport.forEach(item => {
+                            let existingCat = activeDashboardData.find(c => c.title === item.folder);
+                            
+                            if (!existingCat) {
+                                const randomColor = presetColors[Math.floor(Math.random() * presetColors.length)];
+                                existingCat = {
+                                    id: 'cat-' + Math.random().toString(36).substr(2, 9),
+                                    title: item.folder,
+                                    icon: "📁",
+                                    color: randomColor,
+                                    items: []
+                                };
+                                activeDashboardData.push(existingCat);
+                            }
+
+                            existingCat.items.push({
+                                id: 'tool-' + Math.random().toString(36).substr(2, 9),
+                                name: item.name,
+                                url: item.url
+                            });
+                        });
+
+                        allDashboards.forEach(dash => {
+                            if(dash.id === currentDashboardId) {
+                                dash.data = dash.data.filter(c => c.items.length > 0);
+                            }
+                        });
+                    }
+
+                    saveData();
+                    renderDashboard();
+                    closeModal('bookmarksImportModal');
+                    toggleSettings(); 
+                    
+                    showAppNotification("הייבוא הושלם בהצלחה! 🎉", `מערכת הייבוא המותאמת אישית סיימה את פעולתה בהצלחה. ${finalLinksToImport.length} סימניות חדשות התווספו למרחב העבודה שלך.`);
+                    
+                    temporaryParsedBookmarks = [];
+                    event.target.value = "";
+                };
+            };
             
-            alert(`ייבוא סימניות מותאם אישית הושלם! יובאו בהצלחה ${finalLinksToImport.length} סימניות.`);
-            
-            // ניקוי משתנים ושדות
-            temporaryParsedBookmarks = [];
-            event.target.value = "";
-        };
-    };
-    
-    reader.readAsText(file);
-}
+            reader.readAsText(file);
+        }
 
         document.getElementById('searchBar').addEventListener('input', (e) => renderDashboard(e.target.value));
 
-        // אתחול ראשוני של האפליקציה ובורר האייקונים
+        // אתחול מערכת ראשוני
         initEmojiPicker();
         renderTabs();
         renderDashboard();
     </script>
-    <div id="bookmarksImportModal" class="modal" style="z-index: 1300;">
-    <div class="modal-content" style="max-width: 500px;">
-        <div class="modal-header">🌐 הגדרות ייבוא סימניות</div>
-        
-        <div class="form-group">
-            <label style="font-weight: 600; color: var(--accent);">1. כיצד תרצה לסדר את הסימניות?</label>
-            <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
-                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                    <input type="radio" name="bookmarkStructure" value="split" checked style="accent-color: var(--accent);">
-                    <span>פיצול אוטומטי לקטגוריות לפי תיקיות המקור</span>
-                </label>
-                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                    <input type="radio" name="bookmarkStructure" value="flat" style="accent-color: var(--accent);">
-                    <span>ריכוז כל הקישורים תחת קטגוריה אחת ("סימניות מיובאות")</span>
-                </label>
-            </div>
-        </div>
-
-        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.08); margin: 1.5rem 0;">
-
-        <div class="form-group">
-            <label style="font-weight: 600; color: var(--accent);">2. אילו תיקיות תרצה לייבא?</label>
-            <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
-                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                    <input type="radio" name="bookmarkScope" value="all" checked onchange="toggleBookmarksFolderSelector(false)" style="accent-color: var(--accent);">
-                    <span>ברירת מחדל - ייבוא של הכל</span>
-                </label>
-                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                    <input type="radio" name="bookmarkScope" value="custom" onchange="toggleBookmarksFolderSelector(true)" style="accent-color: var(--accent);">
-                    <span>התאמה אישית (בחירת תיקיות ספציפיות)</span>
-                </label>
-            </div>
-        </div>
-
-        <div id="bookmarksFolderSelectorArea" style="display: none; max-height: 200px; overflow-y: auto; background: #0f172a; padding: 1rem; border-radius: 8px; border: 1px solid var(--panel-border); margin-top: 1rem;">
-            <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: bold;">בחר את התיקציות לייבוא:</div>
-            <div id="bookmarksFoldersCheckboxesGrid" style="display: flex; flex-direction: column; gap: 0.4rem;"></div>
-        </div>
-
-        <div class="modal-buttons" style="margin-top: 2rem;">
-            <button class="btn" onclick="closeModal('bookmarksImportModal')">ביטול</button>
-            <button class="btn btn-primary" id="executeBookmarksImportBtn">הפעל ייבוא</button>
-        </div>
-    </div>
-</div>
 </body>
 </html>
