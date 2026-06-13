@@ -27,6 +27,7 @@ body {
     background-image: radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.08), transparent 40%),
                       radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.06), transparent 40%);
     background-attachment: fixed;
+    overflow-x: hidden; /* מבטל בריחת פיקסלים וגלילה אופקית ברמת גוף העמוד */
 }
 
 .container { 
@@ -351,6 +352,8 @@ header h1 {
     border-top: 4px solid var(--accent); 
     cursor: grab; 
     transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s; 
+    max-width: 100%; 
+    overflow: hidden; /* הגנה על הכרטיס מפני התרחבות */
 }
 
 .category-card:active { 
@@ -380,6 +383,7 @@ header h1 {
     display: flex; 
     align-items: center; 
     gap: 0.5rem; 
+    max-width: 75%; /* מונע מכותרות תיקיות ארוכות לדחוף את הכפתורים */
 }
 
 .category-title { 
@@ -388,6 +392,15 @@ header h1 {
     display: flex; 
     align-items: center; 
     gap: 0.4rem; 
+    width: 100%;
+}
+
+/* פתרון חיתוך טקסט ארוך לכותרת התיקייה */
+.category-title span:nth-child(2) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
 }
 
 .category-counter { 
@@ -395,6 +408,7 @@ header h1 {
     color: var(--text-muted); 
     font-weight: normal; 
     margin-right: 0.2rem; 
+    white-space: nowrap;
 }
 
 .category-actions { 
@@ -428,6 +442,8 @@ header h1 {
     flex-direction: column; 
     gap: 0.4rem; 
     cursor: grab; 
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .tool-wrapper:active { 
@@ -453,6 +469,7 @@ header h1 {
     color: var(--text-main); 
     transition: all 0.2s ease; 
     position: relative; 
+    overflow: hidden;
 }
 
 .tool-item:hover { 
@@ -468,7 +485,19 @@ header h1 {
     flex-grow: 1; 
     text-decoration: none; 
     color: inherit; 
-    padding-left: 5rem; 
+    padding-left: 3.8rem; /* משאיר מקום מדויק לכפתורי האפשרויות משמאל */
+    min-w: 0; /* קריטי עבור הפעלת flex truncate */
+}
+
+/* פתרון חיתוך קישורים / שמות ארוכים שמונע את הגלילה האופקית לחלוטין */
+.tool-name { 
+    font-weight: 600; 
+    font-size: 0.98rem; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    width: 100%;
 }
 
 .tool-favicon { 
@@ -478,18 +507,14 @@ header h1 {
     background: #fff; 
     padding: 2px; 
     object-fit: contain; 
-}
-
-.tool-name { 
-    font-weight: 600; 
-    font-size: 0.98rem; 
+    flex-shrink: 0;
 }
 
 .tool-actions-area { 
     position: absolute; 
     left: 0.75rem; 
     display: flex; 
-    gap: 0.3rem; 
+    gap: 0.2rem; 
     opacity: 0; 
     transition: opacity 0.2s; 
     z-index: 10; 
@@ -518,33 +543,30 @@ header h1 {
     background: rgba(239, 68, 68, 0.1); 
 }
 
-/* Sub Links Inline Chips Area */
-.sub-links-container {
-    display: flex;
-    gap: 0.4rem;
-    flex-wrap: wrap;
-    padding-right: 2.2rem;
-    margin-bottom: 0.2rem;
+/* עיצוב בלון התראה קטן הצץ מעל כפתור ההעתקה */
+.tool-action-btn {
+    position: relative;
 }
-
-.sub-link-btn {
-    font-size: 0.78rem;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    color: var(--text-muted);
+.tool-action-btn[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--success);
+    color: #0b0f19;
+    font-size: 0.75rem;
+    font-weight: bold;
     padding: 0.2rem 0.5rem;
     border-radius: 4px;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.2rem;
-    transition: all 0.15s;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+    z-index: 100;
 }
-
-.sub-link-btn:hover {
-    color: var(--accent);
-    border-color: var(--accent);
-    background: rgba(56, 189, 248, 0.05);
+.tool-action-btn.copied-success::after {
+    opacity: 1;
 }
 
 /* Modals Overlay Windows Layout */
