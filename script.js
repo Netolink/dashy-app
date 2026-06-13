@@ -1,4 +1,4 @@
-// קבועים הגדרות ראשוניות
+// קבועים והגדרות ראשוניות
 const presetColors = ['#38bdf8', '#22c55e', '#a855f7', '#f97316', '#ec4899', '#eab308', '#6366f1', '#14b8a6', '#ef4444', '#94a3b8'];
 const defaultPresetEmojis = ['📁', '🚀', '💻', '⚙️', '📊', '🌐', '🔒', '🎨', '📝', '💡', '🛠️', '🔗', '🤖', '👑', '🔥'];
 
@@ -16,15 +16,15 @@ let draggedItemSourceCatId = null;
 let draggedItemId = null;
 
 // ==========================================
-// 1. הגדרות FIREBASE (אופציונלי)
+// 1. הגדרות FIREBASE
 // ==========================================
 const firebaseConfig = {
-    apiKey: "AIzaSyYourKeyHere_IF_YOU_HAVE_ONE",
-    authDomain: "your-app.firebaseapp.com",
-    projectId: "your-app",
-    storageBucket: "your-app.appspot.com",
-    messagingSenderId: "123456789",
-    appId: "1:1234:web:1234"
+  apiKey: "AIzaSyCcxyNvQa-kC-0KDdWKel-2IG9sMI3AuWs",
+  authDomain: "my-dashy-app.firebaseapp.com",
+  projectId: "my-dashy-app",
+  storageBucket: "my-dashy-app.firebasestorage.app",
+  messagingSenderId: "66095384503",
+  appId: "1:66095384503:web:d0747e5c07169a7a6b0a32"
 };
 
 let isFirebaseActive = false;
@@ -42,12 +42,11 @@ const auth = isFirebaseActive ? firebase.auth() : null;
 let currentUser = null;
 let allDashboards = [
     { id: "dash-default", title: "דשבורד ראשי", icon: "🚀", data: [
-        { id: "cat-1", title: "כללי", icon: "📁", color: "#38bdf8", items: [{ id: "t1", name: "Google", url: "https://google.com", clicks: 0, subLinks: [] }] }
+        { id: "cat-1", title: "כללי", icon: "📁", color: "#38bdf8", items: [{ id: "t1", name: "Google", url: "https://google.com", clicks: 0 }] }
     ]}
 ];
 let currentDashboardId = "dash-default";
 
-// טעינה ראשונית מ-LocalStorage במידה ואין Firebase פעיל
 if (!isFirebaseActive && localStorage.getItem('dashy_all_dashboards')) {
     allDashboards = JSON.parse(localStorage.getItem('dashy_all_dashboards'));
     currentDashboardId = localStorage.getItem('dashy_current_id') || allDashboards[0].id;
@@ -104,9 +103,7 @@ function loginWithGoogle() {
     auth.signInWithPopup(provider).catch(err => showAppNotification("שגיאת חיבור", err.message));
 }
 
-function logout() { 
-    auth.signOut().then(() => window.location.reload()); 
-}
+function logout() { auth.signOut().then(() => window.location.reload()); }
 
 // ==========================================
 // 4. ניהול חלוניות מודל והתראות מותאמות
@@ -376,7 +373,7 @@ function deleteCurrentDashboard() {
 }
 
 // ==========================================
-// 8. רינדור קטגוריות וכלים + תתי קישורים
+// 8. רינדור קטגוריות וכלים
 // ==========================================
 function renderDashboard(searchTerm = "") {
     const grid = document.getElementById('categoriesGrid');
@@ -416,7 +413,6 @@ function renderDashboard(searchTerm = "") {
         setupCategoryDragEvents(catCard);
 
         let totalLinksCounter = filteredItems.length;
-        filteredItems.forEach(i => { if(i.subLinks) totalLinksCounter += i.subLinks.length; });
 
         const catHeader = document.createElement('div');
         catHeader.className = "category-header";
@@ -461,37 +457,34 @@ function renderDashboard(searchTerm = "") {
                     <span class="tool-name">${item.name}</span>
                 </a>
                 <div class="tool-actions-area">
-                    <button class="tool-action-btn" onclick="openAddSubLinkModal('${category.id}', '${item.id}')" title="הוספת קיצור פנימי">🔗</button>
-                    <button class="tool-action-btn" onclick="openEditItemModal('${category.id}', '${item.id}')" title="עריכה">✏️</button>
-                    <button class="tool-action-btn btn-delete-item" onclick="deleteItem('${category.id}', '${item.id}')" title="מחיקה">🗑️</button>
+                    <button class="tool-action-btn btn-copy-link" data-tooltip="הועתק!" title="העתק קישור מהיר ללוח">🔗</button>
+                    <button class="tool-action-btn btn-edit-tool" title="עריכה">✏️</button>
+                    <button class="tool-action-btn btn-delete-item" title="מחיקה">🗑️</button>
                 </div>
             `;
-            itemElement.querySelector('.tool-link-area').onclick = () => registerToolClick(category.id, item.id);
-            toolWrapper.appendChild(itemElement);
 
-            const subLinksDiv = document.createElement('div');
-            subLinksDiv.className = "sub-links-container";
+            // מאזינים ייעודיים לכפתורי הפעולה בתוך הכלי
+            itemElement.querySelector('.tool-link-area').onclick = () => registerToolClick(category.id, item.id);
             
-            if (item.subLinks && item.subLinks.length > 0) {
-                item.subLinks.forEach((sub, subIdx) => {
-                    const sLink = document.createElement('a');
-                    sLink.className = "sub-link-btn";
-                    sLink.href = sub.url;
-                    sLink.target = "_blank";
-                    sLink.innerHTML = `🔹 ${sub.title}`;
-                    sLink.onclick = (e) => { e.stopPropagation(); registerToolClick(category.id, item.id); };
-                    
-                    sLink.oncontextmenu = (e) => {
-                        e.preventDefault();
-                        triggerCustomConfirm(`האם למחוק את קיצור הדרך "${sub.title}"?`, () => {
-                            item.subLinks.splice(subIdx, 1);
-                            saveData(); renderDashboard();
-                        });
-                    };
-                    subLinksDiv.appendChild(sLink);
+            // פיצ'ר משודרג: כפתור העתקה מהירה עם בלון צץ מובנה
+            const copyBtn = itemElement.querySelector('.btn-copy-link');
+            copyBtn.onclick = (e) => {
+                e.preventDefault(); e.stopPropagation();
+                navigator.clipboard.writeText(item.url).then(() => {
+                    copyBtn.classList.add('copied-success');
+                    setTimeout(() => copyBtn.classList.remove('copied-success'), 1500);
                 });
-            }
-            toolWrapper.appendChild(subLinksDiv);
+            };
+
+            itemElement.querySelector('.btn-edit-tool').onclick = (e) => {
+                e.preventDefault(); e.stopPropagation(); openEditItemModal(category.id, item.id);
+            };
+
+            itemElement.querySelector('.btn-delete-item').onclick = (e) => {
+                e.preventDefault(); e.stopPropagation(); deleteItem(category.id, item.id);
+            };
+
+            toolWrapper.appendChild(itemElement);
             itemsList.appendChild(toolWrapper);
         });
 
@@ -534,6 +527,7 @@ function setupCategoryDragEvents(el) {
     });
 }
 
+// גרירת הכלים (החלפת מיקום או העברה בין קטגוריות)
 function setupItemDragEvents(el) {
     el.addEventListener('dragstart', (e) => {
         e.stopPropagation();
@@ -548,14 +542,12 @@ function setupItemDragEvents(el) {
         document.querySelectorAll('.tool-wrapper').forEach(w => w.classList.remove('drag-over-item'));
     });
     el.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault(); e.stopPropagation();
         el.classList.add('drag-over-item');
     });
     el.addEventListener('dragleave', () => el.classList.remove('drag-over-item'));
     el.addEventListener('drop', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault(); e.stopPropagation();
         const type = e.dataTransfer.getData('text/type');
         if (type === 'item' && draggedItemId) {
             const targetCatId = el.dataset.catId;
@@ -596,8 +588,7 @@ function moveItemInState(sourceCatId, itemId, targetCatId, targetIndex) {
 
     saveData();
     renderDashboard();
-    draggedItemId = null;
-    draggedItemSourceCatId = null;
+    draggedItemId = null; draggedItemSourceCatId = null;
 }
 
 // ==========================================
@@ -657,7 +648,7 @@ function saveTool() {
 
     const category = getCurrentDashboardData().find(c => c.id === catId);
     if (category) {
-        category.items.push({ id: 'tool-' + Date.now(), name: name, url: url, clicks: 0, subLinks: [] });
+        category.items.push({ id: 'tool-' + Date.now(), name: name, url: url, clicks: 0 });
         saveData(); renderDashboard(); closeModal('itemModal');
         document.getElementById('itemName').value = "";
         document.getElementById('itemUrl').value = "";
@@ -714,34 +705,6 @@ function saveEditTool() {
     saveData(); renderDashboard(); closeModal('editItemModal');
 }
 
-function openAddSubLinkModal(catId, itemId) {
-    document.getElementById('subLinkCatId').value = catId;
-    document.getElementById('subLinkId').value = itemId;
-    document.getElementById('subLinkTitle').value = "";
-    document.getElementById('subLinkUrl').value = "";
-    openModal('subLinkModal');
-}
-
-function saveSubLink() {
-    const catId = document.getElementById('subLinkCatId').value;
-    const itemId = document.getElementById('subLinkId').value;
-    const title = document.getElementById('subLinkTitle').value.trim();
-    let url = document.getElementById('subLinkUrl').value.trim();
-
-    if (!title || !url) return;
-    if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
-
-    const cat = getCurrentDashboardData().find(c => c.id === catId);
-    if (cat) {
-        const item = cat.items.find(i => i.id === itemId);
-        if (item) {
-            if (!item.subLinks) item.subLinks = [];
-            item.subLinks.push({ title, url });
-            saveData(); renderDashboard(); closeModal('subLinkModal');
-        }
-    }
-}
-
 function deleteItem(catId, itemId) {
     triggerCustomConfirm("האם למחוק את הכלי הזה מהדשבורד?", () => {
         const category = getCurrentDashboardData().find(c => c.id === catId);
@@ -752,7 +715,6 @@ function deleteItem(catId, itemId) {
     });
 }
 
-// מחיקת קטגוריה קומפלט
 function deleteCategory(catId) {
     if (getCurrentDashboardData().length <= 1) {
         showAppNotification("פעולה חסומה", "לא ניתן למחוק את הקטגוריה האחרונה שנשארה בדשבורד.");
@@ -798,7 +760,7 @@ function importBookmarksHTML(event) {
     reader.onload = function(e) {
         const parser = new DOMParser(); const doc = parser.parseFromString(e.target.result, 'text/html');
         const allLinks = doc.querySelectorAll('a');
-        if (allLinks.length === 0) { showAppNotification("שגיאה", "לא נמצאו סימניות תקינות."); event.target.value = ""; return; }
+        if (allLinks.length === 0) { showAppNotification("שגיאה", "לאמצאו סימניות תקינות."); event.target.value = ""; return; }
 
         temporaryParsedBookmarks = []; const uniqueFolders = new Set();
         allLinks.forEach(link => {
@@ -836,7 +798,7 @@ function importBookmarksHTML(event) {
             const activeDashboardData = getCurrentDashboardData();
 
             if (structureMode === 'flat') {
-                const importedItems = finalLinksToImport.map(item => ({ id: 'tool-' + Math.random().toString(36).substr(2,9), name: item.name, url: item.url, clicks:0, subLinks:[] }));
+                const importedItems = finalLinksToImport.map(item => ({ id: 'tool-' + Math.random().toString(36).substr(2,9), name: item.name, url: item.url, clicks:0 }));
                 if (importedItems.length > 0) activeDashboardData.push({ id: 'cat-' + Date.now(), title: `סימניות מיובאות (${importedItems.length})`, icon: "🌐", color: "#a855f7", items: importedItems });
             } else {
                 finalLinksToImport.forEach(item => {
@@ -845,7 +807,7 @@ function importBookmarksHTML(event) {
                         existingCat = { id: 'cat-' + Math.random().toString(36).substr(2,9), title: item.folder, icon: "📁", color: presetColors[Math.floor(Math.random() * presetColors.length)], items: [] };
                         activeDashboardData.push(existingCat);
                     }
-                    existingCat.items.push({ id: 'tool-' + Math.random().toString(36).substr(2,9), name: item.name, url: item.url, clicks:0, subLinks:[] });
+                    existingCat.items.push({ id: 'tool-' + Math.random().toString(36).substr(2,9), name: item.name, url: item.url, clicks:0 });
                 });
             }
             saveData(); renderDashboard(); closeModal('bookmarksImportModal'); toggleSettings();
